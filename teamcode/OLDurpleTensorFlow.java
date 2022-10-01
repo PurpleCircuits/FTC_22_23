@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
-public class PurpleTensorFlow {
+public class OLDurpleTensorFlow {
     HardwareMap hwMap;
     private static final String VUFORIA_KEY =
             "AUEPTsj/////AAABmXYBynyLn0xeoNEKiUWEeAAEFvPFDHQUede2OVPhDHFAc4ZnvLxoHoluAS1ACHCMNJb6yYl3NuiHQmRc1m28p9sBRWxOxAEQluIxAP5botlaeikGtcPKmaQdcp98t53w3/WPnVC4OW9VAd6LD+8KFURWHmBm8RbqcCD+VOTenN3excKg8QuGrgiwgp2f21Hse0tkj02caYZovIUxyodab9PHydO0FbvjinBbRcPoh4zN/YmV0IRRrUaxrUvWJVFS+2xuGXJJwet6zELfIslWeU2+rqusIXw/FEw30/ulsg4bXTuQuEhFfs4PHpXM590vObE3eCz2ttYlXiI4qY1TfDBG1DAE7KRcQmH7Ptc7Lx+/";

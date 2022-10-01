@@ -51,9 +51,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "TensorFlowTest", group = "Concept")
+@TeleOp(name = "OLDTensorFlowTest", group = "Concept")
 
-public class ConceptTensorFlowObjectDetection extends LinearOpMode {
+public class OLDConceptTensorFlowObjectDetection extends LinearOpMode {
   /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
    * the following 4 detectable objects
    *  0: Ball,
