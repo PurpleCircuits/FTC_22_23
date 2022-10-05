@@ -43,25 +43,60 @@ public class TestAutoLeftBlue extends LinearOpMode {
         //initalize hardware
         initHardware();
         waitForStart();
-        String level = "left";
+        int location = 0;
         switch (purpleTensor.getLabel(hardwareMap)) {
             case "1 Bolt":
-                level = "bottom";
-                telemetry.addData("1 Bolt", level);
-                telemetry.update();
-                sleep(5000);
-                break;
-            case "2 Bulb":
-                level = "center";
-                telemetry.addData("2 Bulb", level);
+                location = 1;
+                telemetry.log().clear();
+                telemetry.log().add("1 Bolt", "1");
+                telemetry.clear();
                 telemetry.update();
                 sleep(5000);
                 break;
             case "3 Panel":
-                level = "top";
-                telemetry.addData("3 Panel", level);
+                location = 3;
+                telemetry.log().clear();
+                telemetry.log().add("3 Panel", "3");
+                telemetry.clear();
                 telemetry.update();
                 sleep(5000);
+                break;
+            default :
+                location = 2;
+                telemetry.log().clear();
+                telemetry.log().add("2 Bulb", "2");
+                telemetry.clear();
+                telemetry.update();
+                sleep(5000);
+                break;
+        }
+        //TODO Park
+        //forward 36 inches
+        moveBotDrive(36,.75,0,0);
+        //strafe right 12
+        moveBotStrafe(12,0,.5,0);
+        //lift slide up
+        //forward 10
+        moveBotDrive(10,.75,0,0);
+        //TODO put cone down
+        //back up 10 inches
+        moveBotDrive(10,-.75,0,0);
+        //put slide down
+        if (location == 1){
+            //strafe left 36
+            moveBotStrafe(36,0,-.5,0);
+            //forward 12 inches and park
+            moveBotDrive(12,.75,0,0);
+        }else if (location == 2){
+            //strafe left 12
+            moveBotStrafe(12,0,-.5,0);
+            //forward 12 inches and park
+            moveBotDrive(12,.75,0,0);
+        }else{
+            //strafe right 12
+            moveBotStrafe(12,0,.5,0);
+            //forward 12 inches and park
+            moveBotDrive(12,.75,0,0);
         }
     }
 
@@ -73,7 +108,7 @@ public class TestAutoLeftBlue extends LinearOpMode {
         //TODO probably re implement digital sensors
         //digitalSensors = new DigitalSensors();
         //digitalSensors.init(hardwareMap);
-        
+
         purpleTensor = new PurpleTensor();
         // We are expecting the IMU to be attached to an I2C port (port 0) on a Core Device Interface Module and named "imu".
 
