@@ -25,6 +25,10 @@ public class TestAutoLeftBlue extends LinearOpMode {
     //private DigitalSensors digitalSensors = null;
     private PurpleTensor purpleTensor = null;
 
+
+    //Starts recognizing the artifact
+    String artifact;
+
     private static final double SERVO_MIN_POS = 0.0; // Minimum rotational position
     private static final double SERVO_MAX_POS = 1.0; // Maximum rotational position
     private static final double SERVO_OPEN_POS = 0.7; // Start at halfway position
@@ -42,16 +46,17 @@ public class TestAutoLeftBlue extends LinearOpMode {
     public void runOpMode() {
         //initalize hardware
         initHardware();
+        artifact = purpleTensor.getLabel(hardwareMap);
         waitForStart();
         int location = 0;
-        switch (purpleTensor.getLabel(hardwareMap)) {
+        switch (artifact) {
             case "1 Bolt":
                 location = 1;
                 telemetry.log().clear();
                 telemetry.log().add("1 Bolt", "1");
                 telemetry.clear();
                 telemetry.update();
-                sleep(5000);
+                sleep(1000);
                 break;
             case "3 Panel":
                 location = 3;
@@ -59,7 +64,7 @@ public class TestAutoLeftBlue extends LinearOpMode {
                 telemetry.log().add("3 Panel", "3");
                 telemetry.clear();
                 telemetry.update();
-                sleep(5000);
+                sleep(1000);
                 break;
             default :
                 location = 2;
@@ -67,14 +72,14 @@ public class TestAutoLeftBlue extends LinearOpMode {
                 telemetry.log().add("2 Bulb", "2");
                 telemetry.clear();
                 telemetry.update();
-                sleep(5000);
+                sleep(1000);
                 break;
         }
         //TODO Park
         //forward 36 inches
         moveBotDrive(36,.75,0,0);
         //strafe right 12
-        moveBotStrafe(12,0,.5,0);
+        moveBotStrafe(12,0,-.5,0);
         //lift slide up
         //forward 10
         moveBotDrive(10,.75,0,0);
@@ -84,17 +89,17 @@ public class TestAutoLeftBlue extends LinearOpMode {
         //put slide down
         if (location == 1){
             //strafe left 36
-            moveBotStrafe(36,0,-.5,0);
+            moveBotStrafe(36,0,.5,0);
             //forward 12 inches and park
             moveBotDrive(12,.75,0,0);
         }else if (location == 2){
             //strafe left 12
-            moveBotStrafe(12,0,-.5,0);
+            moveBotStrafe(12,0,.5,0);
             //forward 12 inches and park
             moveBotDrive(12,.75,0,0);
         }else{
             //strafe right 12
-            moveBotStrafe(12,0,.5,0);
+            moveBotStrafe(12,0,-.5,0);
             //forward 12 inches and park
             moveBotDrive(12,.75,0,0);
         }

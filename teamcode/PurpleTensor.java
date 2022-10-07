@@ -214,8 +214,7 @@ public class PurpleTensor extends LinearOpMode {
             tfod.setZoom(1.0, 16.0/9.0);
         }
 
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
+            while (true) {
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -235,7 +234,6 @@ public class PurpleTensor extends LinearOpMode {
                     }
                 }
             }
-        }
-        return null;
+        //return null;
     }
 }
