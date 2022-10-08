@@ -79,7 +79,7 @@ public class TestAutoLeftBlue extends LinearOpMode {
         //forward 36 inches
         moveBotDrive(36,.75,0,0);
         //strafe right 12
-        moveBotStrafe(12,0,-.5,0);
+        moveBotStrafe(12,0,-.75,0);
         //lift slide up
         //forward 10
         moveBotDrive(10,.75,0,0);
@@ -89,17 +89,17 @@ public class TestAutoLeftBlue extends LinearOpMode {
         //put slide down
         if (location == 1){
             //strafe left 36
-            moveBotStrafe(36,0,.5,0);
+            moveBotStrafe(36,0,.75,0);
             //forward 12 inches and park
             moveBotDrive(12,.75,0,0);
         }else if (location == 2){
             //strafe left 12
-            moveBotStrafe(12,0,.5,0);
+            moveBotStrafe(12,0,.75,0);
             //forward 12 inches and park
             moveBotDrive(12,.75,0,0);
         }else{
             //strafe right 12
-            moveBotStrafe(12,0,-.5,0);
+            moveBotStrafe(12,0,-.75,0);
             //forward 12 inches and park
             moveBotDrive(12,.75,0,0);
         }
@@ -200,7 +200,8 @@ public class TestAutoLeftBlue extends LinearOpMode {
         trigmecanum.mecanumDrive(0, 0, 0, false, false);
     }
     private double determineStrafeTime(int inches){
-        double m = 21;
+        //used to be 21
+        double m = 16;
         return inches / m;
     }
     private double determineDriveTime(int inches){
