@@ -205,8 +205,69 @@ public class Odometrytrigmecanum {
     //Encoder/Odometry method
     public void resetDriveEncoders(){
         //We might need to make an area where we stop and reset the motor encoders and
+        //TODO I dont think this is needed for anything
     }
     public void stop() {
+        motorFrontLeft.setPower(0);
+        motorFrontRight.setPower(0);
+        motorBackLeft.setPower(0);
+        motorBackRight.setPower(0);
+    }
+    //constants that define the geometry of the robot
+    final static double L = 0.0;//distance between encoder 1 and 2 in cm
+    final static double B = 0.0;//distance between the midpoint of encoder 1 and 2 and encoder 3
+    final static double R = 0.0;//wheel radius in cm
+    final static double N = 8192;//encoder ticks per revolution for REV encoders
+    final static double cm_per_tick = 2.0 * Math.PI * R / N;
 
+    //tracking odometry encoders between updates
+    public int currentRightPosition = 0;
+    public int currentLeftPosition = 0;
+    public int currentAuxPosition = 0;
+
+    private int oldRightPosition = 0;
+    private int oldLeftPosition = 0;
+    private int oldAuxPosition = 0;
+
+    //Odometry notes: n1, n2 ,3 are encoder values for the left right and back (aux) omni-wheels
+    //dn1 dn2 dn3 are the differences of encoder values between two reads
+    //dx dy dtheta describe the robot movement between two reads (in robot coordinates)
+    //X Y Theta are the coordinates on the field and the heading of the robot
+
+    //XyhVectir us a tuple where h is the heading of the robot
+    //TODO this is an issue, he said there was another video on his channel that covered this
+    public XyhVector START_POS = new XyhVector(213,102, Math.toRadians(-174));
+    public XyhVector pos = new XyhVector(START_POS);
+
+    public void odometry(){
+
+        oldRightPosition = currentRightPosition;
+        oldLeftPosition = currentLeftPosition;
+        oldAuxPosition = currentAuxPosition;
+
+        currentRightPosition = -encoderRight.getCurrentPosition();
+        currentLeftPosition = -encoderLeft.getCurrentPosition();
+        currentAuxPosition = encoderAux.getCurrentPosition();
+
+        int dn1 = currentLeftPosition - oldLeftPosition;
+        int dn2 = currentRightPosition - oldRightPosition;
+        int dn3 = currentAuxPosition - oldAuxPosition;
+
+        //the robot has moved and turned a tiny bit between two measurements:
+        double dtheta = cm_per_tick * (dn2 - dn1) / L;
+        double dx = cm_per_tick * (dn1 - dn2) / 2.0;
+        double dy = cm_per_tick * (dn3 - (dn2 - dn1) * B / L);
+
+        //small movement of the robot gets added to the field coordinate system:
+        //TODO this needs the coordinate system found on lines 239-240ish
+        double theta = pos.h + (Dtheta / 2.0);
+        pos.x += dx * Math.cos(theta) - dy * Math.sin(theta);
+        pos.y += dx * Math.sin(theta) + dy * Math.cos(theta);
+        pos.h += dtheta;
+
+        //limit theta to pos minus Pi or plus minus 180 degrees
+        //pos.h = pos.h % (2.0 * Math.PI);
+        //if(pos.h > Math.PI) pos.h -= 2.0 * Math.PI;
+        //if(pos.h < -Math.PI) pos.h += 2.0 * Math.PI;
     }
 }

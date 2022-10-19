@@ -73,7 +73,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
             @Override
             public void onOpened()
             {
-                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -152,7 +152,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
          * The START command just came in: now work off the latest snapshot acquired
          * during the init loop.
          */
-
+        //TODO TAG OF INTEREST IS THE LAST SEEN THING
         /* Update the telemetry */
         if(tagOfInterest != null)
         {
@@ -167,34 +167,14 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }
 
         /* Actually do something useful */
-        if(tagOfInterest == null)
-        {
-            /*
-             * Insert your autonomous code here, presumably running some default configuration
-             * since the tag was never sighted during INIT
-             */
-        }
-        else
-        {
-            /*
-             * Insert your autonomous code here, probably using the tag pose to decide your configuration.
-             */
 
-            // e.g.
-            if(tagOfInterest.pose.x <= 20)
-            {
-                // do something
-            }
-            else if(tagOfInterest.pose.x >= 20 && tagOfInterest.pose.x <= 50)
-            {
-                // do something else
-            }
-            else if(tagOfInterest.pose.x >= 50)
-            {
-                // do something else
-            }
+        if(tagOfInterest == null || tagOfInterest.id == LEFT){
+            //trajectory for left
+        } else if(tagOfInterest.id == MIDDLE){
+            //middle trdct
+        }else{
+            //right trdct
         }
-
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
         while (opModeIsActive()) {sleep(20);}
