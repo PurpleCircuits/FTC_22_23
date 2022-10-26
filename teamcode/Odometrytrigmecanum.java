@@ -236,8 +236,8 @@ public class Odometrytrigmecanum {
 
     //XyhVectir us a tuple where h is the heading of the robot
     //TODO this is an issue, he said there was another video on his channel that covered this
-    public XyhVector START_POS = new XyhVector(213,102, Math.toRadians(-174));
-    public XyhVector pos = new XyhVector(START_POS);
+    //public XyhVector START_POS = new XyhVector(213,102, Math.toRadians(-174));
+    // public XyhVector pos = new XyhVector(START_POS);
 
     public void odometry(){
 
@@ -260,10 +260,10 @@ public class Odometrytrigmecanum {
 
         //small movement of the robot gets added to the field coordinate system:
         //TODO this needs the coordinate system found on lines 239-240ish
-        double theta = pos.h + (Dtheta / 2.0);
-        pos.x += dx * Math.cos(theta) - dy * Math.sin(theta);
-        pos.y += dx * Math.sin(theta) + dy * Math.cos(theta);
-        pos.h += dtheta;
+        //double theta = pos.h + (Dtheta / 2.0);
+        //pos.x += dx * Math.cos(theta) - dy * Math.sin(theta);
+        //pos.y += dx * Math.sin(theta) + dy * Math.cos(theta);
+        //pos.h += dtheta;
 
         //limit theta to pos minus Pi or plus minus 180 degrees
         //pos.h = pos.h % (2.0 * Math.PI);
