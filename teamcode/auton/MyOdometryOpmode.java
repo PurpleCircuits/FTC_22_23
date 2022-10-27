@@ -44,6 +44,7 @@ public class MyOdometryOpmode extends LinearOpMode {
 
         //SAMPLE DRIVE CODE, 24 inches forward
         goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+        //TODO AJN - opmodeIsActive should be an if check (line above and below) - no whiles in Autonomous
         while(opModeIsActive()){
             //Display Global (x, y, theta) coordinates
             telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);

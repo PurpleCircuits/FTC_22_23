@@ -108,7 +108,11 @@ public class OdometryGlobalCoordinatePosition implements Runnable{
     /**
      * Stops the position update thread
      */
-    public void stop(){ isRunning = false; }
+    public void stop(){
+        isRunning = false;
+        //TODO AJN - notify All will tell every thread in a 'wait' condition to wake up and continue processing
+        notifyAll();
+    }
 
     public void reverseLeftEncoder(){
         if(verticalLeftEncoderPositionMultiplier == 1){
@@ -142,7 +146,9 @@ public class OdometryGlobalCoordinatePosition implements Runnable{
         while(isRunning) {
             globalCoordinatePositionUpdate();
             try {
-                Thread.sleep(sleepTime);
+                //TODO AJN - wait and notify are much more elegant ways of managing threads
+                wait(sleepTime);
+                //Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
