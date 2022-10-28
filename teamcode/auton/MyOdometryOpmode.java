@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.auton;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.Trigmecanum;
 import org.firstinspires.ftc.teamcode.auton.OdometryGlobalCoordinatePosition;
 
 /**
@@ -18,6 +20,8 @@ public class MyOdometryOpmode extends LinearOpMode {
     DcMotor verticalLeft, verticalRight, horizontal;
 
     final double COUNTS_PER_INCH = 307.699557;
+
+    private Trigmecanum trigmecanum = null;
 
     //Hardware Map Names for drive motors and odometry wheels. THIS WILL CHANGE ON EACH ROBOT, YOU NEED TO UPDATE THESE VALUES ACCORDINGLY
     String rfName = "motorFrontRight", rbName = "motorBackRight", lfName = "motorFrontLeft", lbName = "motorBackLeft";
@@ -43,9 +47,13 @@ public class MyOdometryOpmode extends LinearOpMode {
         globalPositionUpdate.reverseNormalEncoder();
 
         //SAMPLE DRIVE CODE, 24 inches forward
-        goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+
         //TODO AJN - opmodeIsActive should be an if check (line above and below) - no whiles in Autonomous
         while(opModeIsActive()){
+            trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
+            if(gamepad1.a){
+                goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+            }
             //Display Global (x, y, theta) coordinates
             telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
             telemetry.addData("Y Position", globalPositionUpdate.returnYCoordinate() / COUNTS_PER_INCH);
@@ -80,7 +88,9 @@ public class MyOdometryOpmode extends LinearOpMode {
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
             double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+            trigmecanum.mecanumDrive(robot_movement_y_component, robot_movement_x_component, pivotCorrection, false, false);
         }
+     trigmecanum.mecanumDrive(0,0,0, false, false);
  }
     private void initDriveHardwareMap(String rfName, String rbName, String lfName, String lbName, String vlEncoderName, String vrEncoderName, String hEncoderName){
         right_front = hardwareMap.dcMotor.get(rfName);
@@ -119,6 +129,9 @@ public class MyOdometryOpmode extends LinearOpMode {
         left_front.setDirection(DcMotorSimple.Direction.REVERSE);
         right_front.setDirection(DcMotorSimple.Direction.REVERSE);
         right_back.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        trigmecanum = new Trigmecanum();
+        trigmecanum.init(hardwareMap, DcMotor.Direction.REVERSE, DcMotor.Direction.REVERSE, DcMotor.Direction.REVERSE, DcMotor.Direction.REVERSE);
 
         telemetry.addData("Status", "Hardware Map Init Complete");
         telemetry.update();

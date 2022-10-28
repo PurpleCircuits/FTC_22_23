@@ -41,7 +41,7 @@ public class GlobalCoordinatePositionUpdateSample extends LinearOpMode {
         such that when the verticalLeft and verticalRight encoders spin forward, they return positive values, and when the
         horizontal encoder travels to the right, it returns positive value
         */
-        //TODO he deleted these, if we need to reverse the encoder diredctions we can do it here
+        //TODO he deleted these, if we need to reverse the encoder diredctions we can do it here MAYBE
         //verticalLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         //verticalRight.setDirection(DcMotorSimple.Direction.REVERSE);
         //horizontal.setDirection(DcMotorSimple.Direction.REVERSE);
