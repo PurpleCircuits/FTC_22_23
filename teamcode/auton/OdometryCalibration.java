@@ -32,7 +32,7 @@ public class OdometryCalibration extends LinearOpMode {
     String rfName = "motorFrontRight", rbName = "motorBackRight", lfName = "motorFrontLeft", lbName = "motorBackLeft";
     String verticalLeftEncoderName = rbName, verticalRightEncoderName = lfName, horizontalEncoderName = rfName;
 
-    final double PIVOT_SPEED = 0.5;
+    final double PIVOT_SPEED = 0.3;
 
     //The amount of encoder ticks for each inch the robot moves. THIS WILL CHANGE FOR EACH ROBOT AND NEEDS TO BE UPDATED HERE
     final double COUNTS_PER_INCH = 307.699557;
@@ -168,9 +168,9 @@ public class OdometryCalibration extends LinearOpMode {
         left_back.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         left_front.setDirection(DcMotorSimple.Direction.REVERSE);
-        right_front.setDirection(DcMotorSimple.Direction.REVERSE);
-        right_back.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        right_front.setDirection(DcMotorSimple.Direction.FORWARD);
+        right_back.setDirection(DcMotorSimple.Direction.FORWARD);
+        left_back.setDirection(DcMotorSimple.Direction.REVERSE);
 
         telemetry.addData("Status", "Hardware Map Init Complete");
         telemetry.update();

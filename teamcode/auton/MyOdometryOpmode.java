@@ -42,9 +42,9 @@ public class MyOdometryOpmode extends LinearOpMode {
         globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
         Thread positionThread = new Thread(globalPositionUpdate);
         positionThread.start();
-        //TODO Check lines 71/72 of the sample program to see if these reverses are correct
-        globalPositionUpdate.reverseRightEncoder();
-        globalPositionUpdate.reverseNormalEncoder();
+        //TODO Check lines 71/72 of the sample program to see if these reverses are correct, may have to add these back
+        //globalPositionUpdate.reverseRightEncoder();
+        //globalPositionUpdate.reverseNormalEncoder();
 
         //SAMPLE DRIVE CODE, 24 inches forward
 

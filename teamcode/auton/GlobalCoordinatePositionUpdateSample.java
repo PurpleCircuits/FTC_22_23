@@ -21,7 +21,7 @@ public class GlobalCoordinatePositionUpdateSample extends LinearOpMode {
     final double COUNTS_PER_INCH = 307.699557;
 
     //Hardware map names for the encoder wheels. Again, these will change for each robot and need to be updated below
-    String verticalLeftEncoderName = "rf", verticalRightEncoderName = "lf", horizontalEncoderName = "lb";
+    String verticalLeftEncoderName = "motorBackRight", verticalRightEncoderName = "motorFrontLeft", horizontalEncoderName = "motorFrontRight";
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -67,8 +67,9 @@ public class GlobalCoordinatePositionUpdateSample extends LinearOpMode {
         Thread positionThread = new Thread(globalPositionUpdate);
         positionThread.start();
 
-        //TODO IF NEGATIVE UNCOMMENT THESE FOR THEIR RESPECTIVE ENCODERS, I believe that normalEncoder is horizontal
-        //globalPositionUpdate.reverseLeftEncoder();
+        //TODO IF NEGATIVE UNCOMMENT THESE FOR THEIR RESPECTIVE ENCODERS, normalEncoder is horizontal
+        //globalPositionUpdate.reverseRightEncoder();
+        //globalPositionUpdate.reverseNormalEncoder();
         while(opModeIsActive()){
             //Display Global (x, y, theta) coordinates
             telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
