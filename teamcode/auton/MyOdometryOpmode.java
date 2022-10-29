@@ -19,7 +19,7 @@ public class MyOdometryOpmode extends LinearOpMode {
     //Odometry Wheels
     DcMotor verticalLeft, verticalRight, horizontal;
 
-    final double COUNTS_PER_INCH = 307.699557;
+    final double COUNTS_PER_INCH = 1303.83575;
 
     private Trigmecanum trigmecanum = null;
 
