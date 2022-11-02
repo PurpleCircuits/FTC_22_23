@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode.auton;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Trigmecanum;
 import org.firstinspires.ftc.teamcode.auton.OdometryGlobalCoordinatePosition;
 
@@ -21,7 +27,9 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     final double COUNTS_PER_INCH = 1303.83575;
 
+    private BNO055IMU imu = null;
     private Trigmecanum trigmecanum = null;
+    private ElapsedTime runtime = new ElapsedTime();
 
     //Hardware Map Names for drive motors and odometry wheels. THIS WILL CHANGE ON EACH ROBOT, YOU NEED TO UPDATE THESE VALUES ACCORDINGLY
     String rfName = "motorFrontRight", rbName = "motorBackRight", lfName = "motorFrontLeft", lbName = "motorBackLeft";
@@ -43,8 +51,8 @@ public class MyOdometryOpmode extends LinearOpMode {
         Thread positionThread = new Thread(globalPositionUpdate);
         positionThread.start();
         //TODO Check lines 71/72 of the sample program to see if these reverses are correct, may have to add these back
-        //globalPositionUpdate.reverseRightEncoder();
-        //globalPositionUpdate.reverseNormalEncoder();
+        globalPositionUpdate.reverseRightEncoder();
+        globalPositionUpdate.reverseNormalEncoder();
 
         //SAMPLE DRIVE CODE, 24 inches forward
 
@@ -53,6 +61,14 @@ public class MyOdometryOpmode extends LinearOpMode {
             trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
             if(gamepad1.a){
                 goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+                turnLeft(90,5);
+                goToPosition(0*COUNTS_PER_INCH, 36*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+            }
+            if(gamepad1.b){
+                goToPosition(24*COUNTS_PER_INCH, 0*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+            }
+            if(gamepad1.y){
+                goToPosition(12*COUNTS_PER_INCH, 12*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
             }
             //Display Global (x, y, theta) coordinates
             telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
@@ -80,15 +96,15 @@ public class MyOdometryOpmode extends LinearOpMode {
      while(opModeIsActive() && distance > allowableDistanceError) {
          distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
          distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
-
+         distance = Math.hypot(distanceToXTarget, distanceToYTarget);
 
          //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial?
             double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
 
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
-            trigmecanum.mecanumDrive(robot_movement_y_component, robot_movement_x_component, pivotCorrection, false, false);
+            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
         }
      trigmecanum.mecanumDrive(0,0,0, false, false);
  }
@@ -129,9 +145,16 @@ public class MyOdometryOpmode extends LinearOpMode {
         left_front.setDirection(DcMotorSimple.Direction.REVERSE);
         right_front.setDirection(DcMotorSimple.Direction.REVERSE);
         right_back.setDirection(DcMotorSimple.Direction.REVERSE);
+        left_back.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.loggingEnabled = true;
+        parameters.loggingTag     = "IMU";
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         trigmecanum = new Trigmecanum();
-        trigmecanum.init(hardwareMap, DcMotor.Direction.REVERSE, DcMotor.Direction.REVERSE, DcMotor.Direction.REVERSE, DcMotor.Direction.REVERSE);
+        trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
 
         telemetry.addData("Status", "Hardware Map Init Complete");
         telemetry.update();
@@ -155,5 +178,57 @@ public class MyOdometryOpmode extends LinearOpMode {
      */
     private double calculateY(double desiredAngle, double speed) {
         return Math.cos(Math.toRadians(desiredAngle)) * speed;
+    }
+
+    public void turnLeft(double turnAngle, double timeoutS) {
+        if (!opModeIsActive()){
+            return;
+        }
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double speed=1;
+        double scaledSpeed=speed;
+        double targetHeading=angles.firstAngle+turnAngle;
+        if(targetHeading<-180) {targetHeading+=360;}
+        if(targetHeading>180){targetHeading-=360;}
+        double degreesRemaining = ((int)(Math.signum(angles.firstAngle-targetHeading)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                + (int)(Math.signum(targetHeading-angles.firstAngle)+1)/2*Math.abs(angles.firstAngle-targetHeading);
+        runtime.reset();
+        while(opModeIsActive() && runtime.seconds() < timeoutS && degreesRemaining>3)
+        {
+            //Change the 10 on the line below to a variable
+            scaledSpeed = degreesRemaining / (10 + degreesRemaining) * speed;
+            if(scaledSpeed>1 || scaledSpeed<.5){scaledSpeed=.5;}//We have a minimum and maximum scaled speed
+
+            trigmecanum.mecanumDrive(0,0, scaledSpeed, false, false);
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            degreesRemaining = ((int)(Math.signum(angles.firstAngle-targetHeading)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                    + (int)(Math.signum(targetHeading-angles.firstAngle)+1)/2*Math.abs(angles.firstAngle-targetHeading);
+        }
+        trigmecanum.mecanumDrive(0, 0, 0, false, false);
+    }
+    public void turnRight(double turnAngle, double timeoutS) {
+        if (!opModeIsActive()){
+            return;
+        }
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double speed=1;
+        double scaledSpeed=speed;
+        double targetHeading = angles.firstAngle+turnAngle;
+        if(targetHeading < -180) {targetHeading += 360;}
+        if(targetHeading > 180){targetHeading -= 360;}
+        double degreesRemaining = ((int)(Math.signum(targetHeading-angles.firstAngle)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                + (int)(Math.signum(angles.firstAngle-targetHeading)+1)/2*Math.abs(angles.firstAngle-targetHeading);
+        runtime.reset();
+        while (opModeIsActive() && runtime.seconds() < timeoutS && degreesRemaining>3)
+        {
+            scaledSpeed=degreesRemaining/(10+degreesRemaining)*speed;
+            if(scaledSpeed>1 || scaledSpeed<.5){scaledSpeed=.5;}//We have a minimum and maximum scaled speed
+
+            trigmecanum.mecanumDrive(0,0, -scaledSpeed, false, false);
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            degreesRemaining = ((int)(Math.signum(targetHeading-angles.firstAngle)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                    + (int)(Math.signum(angles.firstAngle-targetHeading)+1)/2*Math.abs(angles.firstAngle-targetHeading);
+        }
+        trigmecanum.mecanumDrive(0, 0, 0, false, false);
     }
 }
