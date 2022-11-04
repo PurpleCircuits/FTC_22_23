@@ -1,31 +1,25 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="TrigMecanumTeleOP", group="Linear Opmode")
 public class TrigMecanumTeleOP extends LinearOpMode {
     private Trigmecanum trigmecanum = null;
-    private Servo theClawServo = null;
+    private PhysicalOperation physicaloperation = null;
+    private DcMotor theSlideMotor = null;
     BNO055IMU imu;
-    private ColorRangeSensor clawDistance = null;
-    private static final double SERVO_MIN_POS = 0.0; // Minimum rotational position
-    private static final double SERVO_MAX_POS = 1; // Maximum rotational position
-    private static final double SERVO_OPEN_POS = 0.7; // Start at halfway position
     @Override
     public void runOpMode() throws InterruptedException {
         initHardware();
         waitForStart();
         while (opModeIsActive()) {
             trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
+            slideAction();
+            clawAction();
         }
     }
     private void initHardware(){
@@ -38,5 +32,28 @@ public class TrigMecanumTeleOP extends LinearOpMode {
         trigmecanum = new Trigmecanum();
         trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
         //FOR MORE ON INITALIZING MOTORS GO TO TRIGMECANUM
+
+        physicaloperation = new PhysicalOperation();
+        physicaloperation.init(hardwareMap);
+
+        theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");
+        theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
+        theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    public void clawAction() {
+        // close the claw
+        if(gamepad2.right_bumper){
+            physicaloperation.clawClosed();
+        }
+        else if(gamepad2.left_bumper){
+            physicaloperation.clawOpen();
+        }
+        //else if (gamepad2.right_bumper || 5 > clawDistance.getDistance(DistanceUnit.CM)) {
+        //    theClawServo.setPosition(SERVO_MIN_POS);
+        //}
+    }
+    public void slideAction(){
+        double power = -gamepad2.left_stick_y;
+        theSlideMotor.setPower(power);
     }
 }
