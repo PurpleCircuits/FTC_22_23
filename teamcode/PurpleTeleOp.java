@@ -4,12 +4,14 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="TrigMecanumTeleOP", group="Linear Opmode")
-public class TrigMecanumTeleOP extends LinearOpMode {
+import org.firstinspires.ftc.teamcode.util.PurpleOps;
+import org.firstinspires.ftc.teamcode.util.Trigmecanum;
+
+@TeleOp(name="PurpleTeleOp", group="Linear Opmode")
+public class PurpleTeleOp extends LinearOpMode {
     private Trigmecanum trigmecanum = null;
-    private PhysicalOperation physicaloperation = null;
+    private PurpleOps physicaloperation = null;
     private DcMotor theSlideMotor = null;
     BNO055IMU imu;
     @Override
@@ -33,7 +35,7 @@ public class TrigMecanumTeleOP extends LinearOpMode {
         trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
         //FOR MORE ON INITALIZING MOTORS GO TO TRIGMECANUM
 
-        physicaloperation = new PhysicalOperation();
+        physicaloperation = new PurpleOps();
         physicaloperation.init(hardwareMap);
 
         theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");

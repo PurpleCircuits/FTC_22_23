@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.auton;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,14 +11,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.Trigmecanum;
-import org.firstinspires.ftc.teamcode.auton.OdometryGlobalCoordinatePosition;
+import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
 /**
  * Created by Sarthak on 10/4/2019.
  */
-@TeleOp(name = "My Odometry OpMode")
-public class MyOdometryOpmode extends LinearOpMode {
+@TeleOp(name = "OdoTest")
+public class OdoTest extends LinearOpMode {
     //Drive motors
     DcMotor right_front, right_back, left_front, left_back;
     //Odometry Wheels
@@ -87,7 +85,8 @@ public class MyOdometryOpmode extends LinearOpMode {
         globalPositionUpdate.stop();
 
     }
- public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError){
+
+ private void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError){
      double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
      double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
 
@@ -98,7 +97,7 @@ public class MyOdometryOpmode extends LinearOpMode {
          distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
          distance = Math.hypot(distanceToXTarget, distanceToYTarget);
 
-         //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial?
+         //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
             double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
 
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
@@ -108,7 +107,8 @@ public class MyOdometryOpmode extends LinearOpMode {
         }
      trigmecanum.mecanumDrive(0,0,0, false, false);
  }
-    private void initDriveHardwareMap(String rfName, String rbName, String lfName, String lbName, String vlEncoderName, String vrEncoderName, String hEncoderName){
+ //changed this to public from private for outside access
+    public void initDriveHardwareMap(String rfName, String rbName, String lfName, String lbName, String vlEncoderName, String vrEncoderName, String hEncoderName){
         right_front = hardwareMap.dcMotor.get(rfName);
         right_back = hardwareMap.dcMotor.get(rbName);
         left_front = hardwareMap.dcMotor.get(lfName);
@@ -155,7 +155,7 @@ public class MyOdometryOpmode extends LinearOpMode {
 
         trigmecanum = new Trigmecanum();
         trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
-
+        //TODO Remove this telemetry for access in other classes
         telemetry.addData("Status", "Hardware Map Init Complete");
         telemetry.update();
     }

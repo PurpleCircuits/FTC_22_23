@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-public class Odometrytrigmecanum {
+public class OLDOdometrytrigmecanum {
 
     public DcMotor motorBackLeft;
     public DcMotor motorBackRight;

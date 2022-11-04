@@ -1,19 +1,26 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.util;
+
 
 
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class DigitalSensors {
+public class PurpleOps {
+    private static final double SERVO_MIN_POS = 0.25; // Minimum rotational position
+    private static final double SERVO_MAX_POS = 1; // Maximum rotational position
+    private static final double SERVO_OPEN_POS = 0.7; // Start at halfway position
+    private DcMotor theSlideMotor = null;
+    private Servo theClawServo = null;
+
     private DigitalChannel slideSwitch1 = null;
     private DigitalChannel clawSwitch1 = null;
     private DigitalChannel clawSwitch2 = null;
@@ -21,23 +28,36 @@ public class DigitalSensors {
     private DistanceSensor rightDistance = null;
     private ColorRangeSensor leftColor = null;
     private ColorRangeSensor rightColor = null;
+
     HardwareMap hwMap;
 
-    public void init(HardwareMap ahwMap){
-        hwMap = ahwMap;
-        //slideSwitch1 = hwMap.get(DigitalChannel.class, "slide_switch_1");
-        //slideSwitch1.setMode(DigitalChannel.Mode.INPUT);
+    public void init(HardwareMap hardwareMap){
+        hwMap = hardwareMap;
+        theClawServo = hardwareMap.get(Servo.class, "the_claw_servo");
 
-        clawSwitch1 = hwMap.get(DigitalChannel.class, "claw_switch_1");
-        clawSwitch1.setMode(DigitalChannel.Mode.INPUT);
+        theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");
+        theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
+        theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftDistance = hwMap.get(DistanceSensor.class, "left_distance");
-        leftColor = hwMap.get(ColorRangeSensor.class, "left_color");
+
+            //slideSwitch1 = hwMap.get(DigitalChannel.class, "slide_switch_1");
+            //slideSwitch1.setMode(DigitalChannel.Mode.INPUT);
+
+            //clawSwitch1 = hwMap.get(DigitalChannel.class, "claw_switch_1");
+            //clawSwitch1.setMode(DigitalChannel.Mode.INPUT);
+
+            //leftDistance = hwMap.get(DistanceSensor.class, "left_distance");
+        //leftColor = hwMap.get(ColorRangeSensor.class, "left_color");
         //rightColor = hwMap.get(ColorRangeSensor.class, "right_color");
 
         //clawSwitch2 = hwMap.get(DigitalChannel.class, "claw_switch_2");
         //clawSwitch2.setMode(DigitalChannel.Mode.INPUT);
-
+    }
+    public void clawOpen(){
+        theClawServo.setPosition(SERVO_OPEN_POS);
+    }
+    public void clawClosed(){
+        theClawServo.setPosition(SERVO_MIN_POS);
     }
     /**
      * Checks to see if claw switch 2 is at limit.
