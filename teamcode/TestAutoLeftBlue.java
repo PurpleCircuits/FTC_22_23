@@ -13,31 +13,57 @@ public class TestAutoLeftBlue extends LinearOpMode {
     private PurpleTagRecognition purpleTagRecognition = null;
     private PurpleAutoDrive purpleAutoDrive = null;
 
+    // Tag ID 1, 2, and 3 from the 36h11 family
+    int LEFT = 1;
+    int MIDDLE = 2;
+    int RIGHT = 3;
+
     //private DcMotor theSpinMotor = null;
     //private DcMotor theClawMotor = null;
     //private Servo theClawServo = null;
     private BNO055IMU imu = null;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         //initalize hardware
         initHardware();
         waitForStart();
-
+        int position = RIGHT;
         //TODO maybe put the like driving to drop cone code before this and only access this later, otherwise repetitive code
-        if(purpleTagRecognition.getDetection() == 1){
-            //CODE TO LEFT/ONE
-        } else if(purpleTagRecognition.getDetection() == 2){
-            //Code for middle
+        if(purpleTagRecognition.getDetection() == LEFT){
+            position = LEFT;
+        } else if(purpleTagRecognition.getDetection() == MIDDLE){
+            position = MIDDLE;
         } else {
-            //code for Right
+            position = RIGHT;
+        }
+        if(opModeIsActive())
+        purpleAutoDrive.goToPosition(24,0,.75,0,1,5);
+        if(opModeIsActive())
+        purpleAutoDrive.goToPosition(24,36,.75,0,1,5);
+        //Simulate putting claw up
+        sleep(2000);
+        if(opModeIsActive())
+        purpleAutoDrive.goToPosition(28,36,.75,0,1,5);
+        if(opModeIsActive())
+        purpleAutoDrive.goToPosition(24,36,.75,0,1,5);
+        if(position == RIGHT){
+            if(opModeIsActive())
+            purpleAutoDrive.goToPosition(24,12,.75,0,1,5);
+        } else if(position == MIDDLE){
+            if(opModeIsActive())
+            purpleAutoDrive.goToPosition(24,-12,.75,0,1,5);
+        } else {
+            if(opModeIsActive())
+            purpleAutoDrive.goToPosition(24,-24,.75,0,1,10);
+            if(opModeIsActive())
+            purpleAutoDrive.goToPosition(36,-24,.75,0,1,5);
         }
         //stops the mapping thread
         purpleAutoDrive.cleanUp();
     }
 
     private void initHardware() {
-
         // We are expecting the IMU to be attached to an I2C port (port 0) on a Core Device Interface Module and named "imu".
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.loggingEnabled = true;

@@ -34,7 +34,7 @@ public class PurpleAutoDrive {
 
     OdometryGlobalCoordinatePosition globalPositionUpdate;
 
- public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError, int timeout){
+ public void goToPosition(double targetYPosition, double targetXPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError, int timeout) throws InterruptedException {
      double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
      double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
 
@@ -55,6 +55,7 @@ public class PurpleAutoDrive {
             trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
         }
      trigmecanum.mecanumDrive(0,0,0, false, false);
+     Thread.sleep(200);
  }
 
  //changed this to public from private for outside access
