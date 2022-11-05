@@ -74,10 +74,10 @@ public class PurpleTagRecognition {
                     //TODO Maybe make something other than tagofinterest, I cant call it null for some reason in the auto program so if it doesnt see anything the whole auto will fail I believe
                     tagOfInterest = tag;
                     tagFound = true;
-                    break;
+                    return tagOfInterest.id;
                 }
             }
         }
-        return tagOfInterest.id;
+        return LEFT;
     }
 }

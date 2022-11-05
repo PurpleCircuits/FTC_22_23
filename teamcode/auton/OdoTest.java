@@ -13,9 +13,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-/**
- * Created by Sarthak on 10/4/2019.
- */
 @TeleOp(name = "OdoTest")
 public class OdoTest extends LinearOpMode {
     //Drive motors
