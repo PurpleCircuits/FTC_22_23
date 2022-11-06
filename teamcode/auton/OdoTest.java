@@ -19,7 +19,7 @@ public class OdoTest extends LinearOpMode {
     DcMotor right_front, right_back, left_front, left_back;
     //Odometry Wheels
     DcMotor verticalLeft, verticalRight, horizontal;
-
+    private PurpleAutoDrive purpleAutoDrive = null;
     final double COUNTS_PER_INCH = 1303.83575;
 
     private BNO055IMU imu = null;
@@ -35,12 +35,14 @@ public class OdoTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //Initialize hardware map values. PLEASE UPDATE THESE VALUES TO MATCH YOUR CONFIGURATION
-        initDriveHardwareMap(rfName, rbName, lfName, lbName, verticalLeftEncoderName, verticalRightEncoderName, horizontalEncoderName);
+        //initDriveHardwareMap(rfName, rbName, lfName, lbName, verticalLeftEncoderName, verticalRightEncoderName, horizontalEncoderName);
+        initHardware();
 
         telemetry.addData("Status", "Init Complete");
         telemetry.update();
         waitForStart();
-
+        purpleAutoDrive.startObservation();
+/*
         //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
         globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
         Thread positionThread = new Thread(globalPositionUpdate);
@@ -49,37 +51,34 @@ public class OdoTest extends LinearOpMode {
         globalPositionUpdate.reverseRightEncoder();
         globalPositionUpdate.reverseNormalEncoder();
 
+ */
+
         //SAMPLE DRIVE CODE, 24 inches forward
 
         //TODO AJN - opmodeIsActive should be an if check (line above and below) - no whiles in Autonomous
         while(opModeIsActive()){
-            trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
+            //trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
             if(gamepad1.a){
-                goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
-                turnLeft(90,5);
-                goToPosition(0*COUNTS_PER_INCH, 36*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+                //goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+                purpleAutoDrive.goToPosition(0,24,.5,0,1,5);
             }
-            if(gamepad1.b){
-                goToPosition(24*COUNTS_PER_INCH, 0*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
-            }
-            if(gamepad1.y){
-                goToPosition(12*COUNTS_PER_INCH, 12*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
-            }
+
             //Display Global (x, y, theta) coordinates
-            telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
-            telemetry.addData("Y Position", globalPositionUpdate.returnYCoordinate() / COUNTS_PER_INCH);
-            telemetry.addData("Orientation (Degrees)", globalPositionUpdate.returnOrientation());
+            //telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
+            //telemetry.addData("Y Position", globalPositionUpdate.returnYCoordinate() / COUNTS_PER_INCH);
+            //telemetry.addData("Orientation (Degrees)", globalPositionUpdate.returnOrientation());
 
-            telemetry.addData("Vertical left encoder position", verticalLeft.getCurrentPosition());
-            telemetry.addData("Vertical right encoder position", verticalRight.getCurrentPosition());
-            telemetry.addData("horizontal encoder position", horizontal.getCurrentPosition());
+            //telemetry.addData("Vertical left encoder position", verticalLeft.getCurrentPosition());
+            //telemetry.addData("Vertical right encoder position", verticalRight.getCurrentPosition());
+            //telemetry.addData("horizontal encoder position", horizontal.getCurrentPosition());
 
-            telemetry.addData("Thread Active", positionThread.isAlive());
-            telemetry.update();
+            //telemetry.addData("Thread Active", positionThread.isAlive());
+            //telemetry.update();
         }
 
         //Stop the thread
-        globalPositionUpdate.stop();
+        //globalPositionUpdate.stop();
+        purpleAutoDrive.cleanUp();
 
     }
 
@@ -103,6 +102,19 @@ public class OdoTest extends LinearOpMode {
             trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
         }
      trigmecanum.mecanumDrive(0,0,0, false, false);
+ }
+
+ //TODO
+ private void initHardware() {
+
+     purpleAutoDrive = new PurpleAutoDrive();
+     purpleAutoDrive.initDriveHardwareMap(hardwareMap);
+
+     // Log that init hardware is finished
+     telemetry.log().clear();
+     telemetry.log().add("Init. hardware finished.");
+     telemetry.clear();
+     telemetry.update();
  }
  //changed this to public from private for outside access
     public void initDriveHardwareMap(String rfName, String rbName, String lfName, String lbName, String vlEncoderName, String vrEncoderName, String hEncoderName){

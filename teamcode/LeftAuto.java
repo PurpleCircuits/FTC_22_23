@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.auton.OdometryGlobalCoordinatePosition;
@@ -13,8 +12,8 @@ import org.firstinspires.ftc.teamcode.auton.PurpleAutoDrive;
 import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-@Autonomous(name = "TestAutoLeftBlue", group = "Linear Opmode")
-public class TestAutoLeftBlue extends LinearOpMode {
+@Autonomous(name = "LeftAuto")
+public class LeftAuto extends LinearOpMode {
 
     private PurpleTagRecognition purpleTagRecognition = null;
     private PurpleAutoDrive purpleAutoDrive = null;
@@ -46,18 +45,21 @@ public class TestAutoLeftBlue extends LinearOpMode {
 
     OdometryGlobalCoordinatePosition globalPositionUpdate;
 
+
     @Override
     public void runOpMode() {
         //initalize hardware
         initHardware();
+        waitForStart();
+
         //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
         globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
         Thread positionThread = new Thread(globalPositionUpdate);
         positionThread.start();
-        //Check the next two lines if the encoders ever start acting up
+        //TODO Check lines 71/72 of the sample program to see if these reverses are correct, may have to add these back
         globalPositionUpdate.reverseRightEncoder();
         globalPositionUpdate.reverseNormalEncoder();
-        waitForStart();
+
         int position = RIGHT;
         //TODO maybe put the like driving to drop cone code before this and only access this later, otherwise repetitive code
         if(purpleTagRecognition.getDetection() == LEFT){
@@ -67,81 +69,36 @@ public class TestAutoLeftBlue extends LinearOpMode {
         } else {
             position = RIGHT;
         }
-        if(opModeIsActive())
-        goToPosition(24,0,.75,0,1,5);
-        sleep(2000);
-        /*
-        if(opModeIsActive())
-        goToPosition(24,36,.75,0,1,5);
+        goToPosition(0*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+
+        goToPosition(36*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
         sleep(2000);
         //Simulate putting claw up
         sleep(2000);
-        if(opModeIsActive())
-        purpleAutoDrive.goToPosition(28,36,.75,0,1,5);
+        goToPosition(36*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        goToPosition(36*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        //simulate claw down
         sleep(2000);
-        if(opModeIsActive())
-        purpleAutoDrive.goToPosition(24,36,.75,0,1,5);
-        sleep(2000);
-        if(position == RIGHT){
-            if(opModeIsActive())
-            purpleAutoDrive.goToPosition(24,12,.75,0,1,5);
+
+        if(position == LEFT){
+            goToPosition(-24*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+            goToPosition(-24*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
         } else if(position == MIDDLE){
-            if(opModeIsActive())
-            purpleAutoDrive.goToPosition(24,-12,.75,0,1,5);
+            goToPosition(0*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+            goToPosition(0*COUNTS_PER_INCH,48*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
         } else {
-            if(opModeIsActive())
-            purpleAutoDrive.goToPosition(24,-24,.75,0,1,10);
-            if(opModeIsActive())
-            purpleAutoDrive.goToPosition(36,-24,.75,0,1,5);
+            goToPosition(24*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+            goToPosition(24*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
         }
         //stops the mapping thread
-         */
-        purpleAutoDrive.cleanUp();
+        globalPositionUpdate.stop();
     }
 
+
     private void initHardware() {
-        // We are expecting the IMU to be attached to an I2C port (port 0) on a Core Device Interface Module and named "imu".
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.loggingEnabled = true;
-        parameters.loggingTag     = "IMU";
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
 
         purpleTagRecognition = new PurpleTagRecognition();
         purpleTagRecognition.initHardware(hardwareMap);
-
-        //purpleAutoDrive = new PurpleAutoDrive();
-        //purpleAutoDrive.initDriveHardwareMap(hardwareMap);
-        initDriveHardwareMap(hardwareMap);
-        // Log that init hardware is finished
-        telemetry.log().clear();
-        telemetry.log().add("Init. hardware finished.");
-        telemetry.clear();
-        telemetry.update();
-    }
-    public void goToPosition(double targetYPosition, double targetXPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError, int timeout) {
-        double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
-        double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
-
-        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-
-        runtime.reset();
-        while(opModeIsActive() && runtime.seconds() < timeout && distance > allowableDistanceError) {
-            distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
-            distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
-            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-
-            //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
-            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
-
-            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
-            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
-            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
-        }
-        trigmecanum.mecanumDrive(0,0,0, false, false);
-    }
-    public void initDriveHardwareMap(HardwareMap hardwareMap){
         right_front = hardwareMap.dcMotor.get(rfName);
         right_back = hardwareMap.dcMotor.get(rbName);
         left_front = hardwareMap.dcMotor.get(lfName);
@@ -179,16 +136,52 @@ public class TestAutoLeftBlue extends LinearOpMode {
         right_front.setDirection(DcMotorSimple.Direction.REVERSE);
         right_back.setDirection(DcMotorSimple.Direction.REVERSE);
         left_back.setDirection(DcMotorSimple.Direction.REVERSE);
-/*
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.loggingEnabled = true;
         parameters.loggingTag     = "IMU";
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-*/
+
         trigmecanum = new Trigmecanum();
         trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
+
+        // Log that init hardware is finished
+        telemetry.log().clear();
+        telemetry.log().add("Init. hardware finished.");
+        telemetry.clear();
+        telemetry.update();
     }
+
+    private void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError){
+        double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
+        double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
+
+        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+
+        while(opModeIsActive() && distance > allowableDistanceError) {
+            distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
+            distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
+            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+
+            //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
+            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
+
+            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
+            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
+            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
+        }
+        trigmecanum.mecanumDrive(0,0,0, false, false);
+        //TODO if we move this into another class, get rid of the sleep
+        sleep(200);
+    }
+    /**
+     * Calculate the power in the x direction
+     * @param desiredAngle angle on the x axis
+     * @param speed robot's speed
+     * @return the x vector
+     */
     private double calculateX(double desiredAngle, double speed) {
         return Math.sin(Math.toRadians(desiredAngle)) * speed;
     }

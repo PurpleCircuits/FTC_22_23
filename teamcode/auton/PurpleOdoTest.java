@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.auton;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,9 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class PurpleAutoDrive {
+@Autonomous(name = "PurpleOdoTest")
+public class PurpleOdoTest extends LinearOpMode {
     //Drive motors
     DcMotor right_front, right_back, left_front, left_back;
     //Odometry Wheels
@@ -30,14 +33,64 @@ public class PurpleAutoDrive {
 
     OdometryGlobalCoordinatePosition globalPositionUpdate;
 
- public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError, int timeout) {
+    @Override
+    public void runOpMode() throws InterruptedException {
+        //Initialize hardware map values. PLEASE UPDATE THESE VALUES TO MATCH YOUR CONFIGURATION
+        initDriveHardwareMap(rfName, rbName, lfName, lbName, verticalLeftEncoderName, verticalRightEncoderName, horizontalEncoderName);
+
+        telemetry.addData("Status", "Init Complete");
+        telemetry.update();
+        waitForStart();
+
+        //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
+        globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
+        Thread positionThread = new Thread(globalPositionUpdate);
+        positionThread.start();
+        //TODO Check lines 71/72 of the sample program to see if these reverses are correct, may have to add these back
+        globalPositionUpdate.reverseRightEncoder();
+        globalPositionUpdate.reverseNormalEncoder();
+
+        //SAMPLE DRIVE CODE, 24 inches forward
+        goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+        /*
+        //TODO AJN - opmodeIsActive should be an if check (line above and below) - no whiles in Autonomous
+        while(opModeIsActive()){
+            trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
+            if(gamepad1.a){
+                goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+            }
+            if(gamepad1.b){
+                goToPosition(24*COUNTS_PER_INCH, 0*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+            }
+            if(gamepad1.y){
+                goToPosition(12*COUNTS_PER_INCH, 12*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
+            }
+            //Display Global (x, y, theta) coordinates
+            telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
+            telemetry.addData("Y Position", globalPositionUpdate.returnYCoordinate() / COUNTS_PER_INCH);
+            telemetry.addData("Orientation (Degrees)", globalPositionUpdate.returnOrientation());
+
+            telemetry.addData("Vertical left encoder position", verticalLeft.getCurrentPosition());
+            telemetry.addData("Vertical right encoder position", verticalRight.getCurrentPosition());
+            telemetry.addData("horizontal encoder position", horizontal.getCurrentPosition());
+
+            telemetry.addData("Thread Active", positionThread.isAlive());
+            telemetry.update();
+        }
+        */
+
+        //Stop the thread
+        globalPositionUpdate.stop();
+
+    }
+
+ private void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError){
      double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
      double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
 
      double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
 
-     runtime.reset();
-     while(runtime.seconds() < timeout && distance > allowableDistanceError) {
+     while(opModeIsActive() && distance > allowableDistanceError) {
          distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
          distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
          distance = Math.hypot(distanceToXTarget, distanceToYTarget);
@@ -52,17 +105,16 @@ public class PurpleAutoDrive {
         }
      trigmecanum.mecanumDrive(0,0,0, false, false);
  }
-
  //changed this to public from private for outside access
-    public void initDriveHardwareMap(HardwareMap hardwareMap){
+    public void initDriveHardwareMap(String rfName, String rbName, String lfName, String lbName, String vlEncoderName, String vrEncoderName, String hEncoderName){
         right_front = hardwareMap.dcMotor.get(rfName);
         right_back = hardwareMap.dcMotor.get(rbName);
         left_front = hardwareMap.dcMotor.get(lfName);
         left_back = hardwareMap.dcMotor.get(lbName);
 
-        verticalLeft = hardwareMap.dcMotor.get(verticalLeftEncoderName);
-        verticalRight = hardwareMap.dcMotor.get(verticalRightEncoderName);
-        horizontal = hardwareMap.dcMotor.get(horizontalEncoderName);
+        verticalLeft = hardwareMap.dcMotor.get(vlEncoderName);
+        verticalRight = hardwareMap.dcMotor.get(vrEncoderName);
+        horizontal = hardwareMap.dcMotor.get(hEncoderName);
 
         right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -101,18 +153,9 @@ public class PurpleAutoDrive {
 
         trigmecanum = new Trigmecanum();
         trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
-
-    }
-
-    public void startObservation()
-    {
-        //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
-        globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
-        Thread positionThread = new Thread(globalPositionUpdate);
-        positionThread.start();
-        //Check the next two lines if the encoders ever start acting up
-        globalPositionUpdate.reverseRightEncoder();
-        globalPositionUpdate.reverseNormalEncoder();
+        //TODO Remove this telemetry for access in other classes
+        telemetry.addData("Status", "Hardware Map Init Complete");
+        telemetry.update();
     }
 
     /**
@@ -136,6 +179,9 @@ public class PurpleAutoDrive {
     }
 
     public void turnLeft(double turnAngle, double timeoutS) {
+        if (!opModeIsActive()){
+            return;
+        }
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double speed=1;
         double scaledSpeed=speed;
@@ -145,7 +191,7 @@ public class PurpleAutoDrive {
         double degreesRemaining = ((int)(Math.signum(angles.firstAngle-targetHeading)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
                 + (int)(Math.signum(targetHeading-angles.firstAngle)+1)/2*Math.abs(angles.firstAngle-targetHeading);
         runtime.reset();
-        while(runtime.seconds() < timeoutS && degreesRemaining>3)
+        while(opModeIsActive() && runtime.seconds() < timeoutS && degreesRemaining>3)
         {
             //Change the 10 on the line below to a variable
             scaledSpeed = degreesRemaining / (10 + degreesRemaining) * speed;
@@ -159,6 +205,9 @@ public class PurpleAutoDrive {
         trigmecanum.mecanumDrive(0, 0, 0, false, false);
     }
     public void turnRight(double turnAngle, double timeoutS) {
+        if (!opModeIsActive()){
+            return;
+        }
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double speed=1;
         double scaledSpeed=speed;
@@ -168,7 +217,7 @@ public class PurpleAutoDrive {
         double degreesRemaining = ((int)(Math.signum(targetHeading-angles.firstAngle)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
                 + (int)(Math.signum(angles.firstAngle-targetHeading)+1)/2*Math.abs(angles.firstAngle-targetHeading);
         runtime.reset();
-        while (runtime.seconds() < timeoutS && degreesRemaining>3)
+        while (opModeIsActive() && runtime.seconds() < timeoutS && degreesRemaining>3)
         {
             scaledSpeed=degreesRemaining/(10+degreesRemaining)*speed;
             if(scaledSpeed>1 || scaledSpeed<.5){scaledSpeed=.5;}//We have a minimum and maximum scaled speed
@@ -179,8 +228,5 @@ public class PurpleAutoDrive {
                     + (int)(Math.signum(angles.firstAngle-targetHeading)+1)/2*Math.abs(angles.firstAngle-targetHeading);
         }
         trigmecanum.mecanumDrive(0, 0, 0, false, false);
-    }
-    public void cleanUp(){
-        globalPositionUpdate.stop();
     }
 }
