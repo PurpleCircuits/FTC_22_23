@@ -5,11 +5,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.auton.OdometryGlobalCoordinatePosition;
 import org.firstinspires.ftc.teamcode.auton.PurpleAutoDrive;
 import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
+import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
 @Autonomous(name = "RightAuto")
@@ -17,15 +23,15 @@ public class RightAuto extends LinearOpMode {
 
     private PurpleTagRecognition purpleTagRecognition = null;
     private PurpleAutoDrive purpleAutoDrive = null;
+    private PurpleOps purpleOps = null;
 
+    private DcMotor theSlideMotor = null;
+    private DigitalChannel slideSwitch = null;
     // Tag ID 1, 2, and 3 from the 36h11 family
     int LEFT = 1;
     int MIDDLE = 2;
     int RIGHT = 3;
 
-    //private DcMotor theSpinMotor = null;
-    //private DcMotor theClawMotor = null;
-    //private Servo theClawServo = null;
     private BNO055IMU imu = null;
 
     //TODO copied from other area
@@ -69,16 +75,22 @@ public class RightAuto extends LinearOpMode {
         } else {
             position = RIGHT;
         }
-        goToPosition(0*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+        purpleOps.clawClosed();
+        slideAction(5, -.5);
 
-        goToPosition(-36*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
-        sleep(2000);
-        //Simulate putting claw up
-        sleep(2000);
+        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+
+        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+        //Did 5 up earlier
+        slideAction(30, -.5);
+
         goToPosition(-36*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
-        goToPosition(-36*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
-        //simulate claw down
-        sleep(2000);
+        sleep(500);
+        purpleOps.clawOpen();
+        sleep(100);
+        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        purpleOps.clawClosed();
+        slideAction(-35,.5);
 
         if(position == LEFT){
             goToPosition(24*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
@@ -96,13 +108,20 @@ public class RightAuto extends LinearOpMode {
 
 
     private void initHardware() {
-
         purpleTagRecognition = new PurpleTagRecognition();
         purpleTagRecognition.initHardware(hardwareMap);
+
+        purpleOps = new PurpleOps();
+        purpleOps.init(hardwareMap);
+
         right_front = hardwareMap.dcMotor.get(rfName);
         right_back = hardwareMap.dcMotor.get(rbName);
         left_front = hardwareMap.dcMotor.get(lfName);
         left_back = hardwareMap.dcMotor.get(lbName);
+
+        theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");
+        theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
+        theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         verticalLeft = hardwareMap.dcMotor.get(verticalLeftEncoderName);
         verticalRight = hardwareMap.dcMotor.get(verticalRightEncoderName);
@@ -195,102 +214,64 @@ public class RightAuto extends LinearOpMode {
     private double calculateY(double desiredAngle, double speed) {
         return Math.cos(Math.toRadians(desiredAngle)) * speed;
     }
+    private void slideAction(double inchHeight, double power){
+        double speed = power;
+        theSlideMotor.setTargetPosition(0);
+        theSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        theSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //38.814 is the ticks per inch on
+        theSlideMotor.setTargetPosition((int)(inchHeight * 38.814));
+        theSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        theSlideMotor.setPower(speed);
+        while(opModeIsActive() && theSlideMotor.isBusy()){
+        }
+        theSlideMotor.setPower(0);
+    }
 
-    /* OLD CODE FROM LAST YEAR THAT MIGHT BE USEFUL
-    private void clawAction(){
-        theClawMotor.setTargetPosition(0);
-        if(digitalSensors.isCS1AtLimit()){
-            theClawMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }else{
-            while(!digitalSensors.isCS1AtLimit()){
-                theClawMotor.setPower(-.25);
-            }
-            theClawMotor.setPower(0);
-        }
-    }
-    public void rightToDistance(int distance, int timeout){
+    public void turnLeft(double turnAngle, double timeoutS) {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double speed=1;
+        double scaledSpeed=speed;
+        double targetHeading=angles.firstAngle+turnAngle;
+        if(targetHeading<-180) {targetHeading+=360;}
+        if(targetHeading>180){targetHeading-=360;}
+        double degreesRemaining = ((int)(Math.signum(angles.firstAngle-targetHeading)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                + (int)(Math.signum(targetHeading-angles.firstAngle)+1)/2*Math.abs(angles.firstAngle-targetHeading);
         runtime.reset();
-        while(opModeIsActive() && rightDistance.getDistance(CM) > distance && runtime.seconds() < timeout)
+        while(runtime.seconds() < timeoutS && degreesRemaining>3)
         {
-            trigmecanum.mecanumDrive(0,-1,0,false,false);
-        }
-        trigmecanum.mecanumDrive(0,0,0,false,false);
-    }
-    private void runToClawPosition(int tics){
-        theClawMotor.setTargetPosition(tics);
-        theClawMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        theClawMotor.setPower(.5);
-        while (opModeIsActive() && theClawMotor.isBusy()){
-            //potential telemetry here if needed
-        }
-        theClawMotor.setPower(0);
-    }
-    private void runToColor(double speed, int timeout){
-        runtime.reset();
-        while(opModeIsActive() && digitalSensors.getColors().blue < .010 && runtime.seconds() < timeout)
-        {
-            trigmecanum.mecanumDrive(speed,0,0,false,false);
-        }
-        trigmecanum.mecanumDrive(0,0,0,false,false);
-    }
-     */
-    //TODO OLD AUTO CODE:
-    /*
+            //Change the 10 on the line below to a variable
+            scaledSpeed = degreesRemaining / (10 + degreesRemaining) * speed;
+            if(scaledSpeed>1 || scaledSpeed<.5){scaledSpeed=.5;}//We have a minimum and maximum scaled speed
 
-        int location = 0;
-        switch (artifact) {
-            case "1 Bolt":
-                location = 1;
-                telemetry.log().clear();
-                telemetry.log().add("1 Bolt", "1");
-                telemetry.clear();
-                telemetry.update();
-                sleep(1000);
-                break;
-            case "3 Panel":
-                location = 3;
-                telemetry.log().clear();
-                telemetry.log().add("3 Panel", "3");
-                telemetry.clear();
-                telemetry.update();
-                sleep(1000);
-                break;
-            default :
-                location = 2;
-                telemetry.log().clear();
-                telemetry.log().add("2 Bulb", "2");
-                telemetry.clear();
-                telemetry.update();
-                sleep(1000);
-                break;
+            trigmecanum.mecanumDrive(0,0, scaledSpeed, false, false);
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            degreesRemaining = ((int)(Math.signum(angles.firstAngle-targetHeading)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                    + (int)(Math.signum(targetHeading-angles.firstAngle)+1)/2*Math.abs(angles.firstAngle-targetHeading);
         }
-        //TODO Park
-        //forward 36 inches
-        moveBotDrive(36,.75,0,0);
-        //strafe right 12
-        moveBotStrafe(12,0,-.75,0);
-        //lift slide up
-        //forward 10
-        moveBotDrive(10,.75,0,0);
-        //TODO put cone down
-        //back up 10 inches
-        moveBotDrive(10,-.75,0,0);
-        //put slide down
-        if (location == 1){
-            //strafe left 36
-            moveBotStrafe(36,0,.75,0);
-            //forward 12 inches and park
-            moveBotDrive(12,.75,0,0);
-        }else if (location == 2){
-            //strafe left 12
-            moveBotStrafe(12,0,.75,0);
-            //forward 12 inches and park
-            moveBotDrive(12,.75,0,0);
-        }else{
-            //strafe right 12
-            moveBotStrafe(12,0,-.75,0);
-            //forward 12 inches and park
-            moveBotDrive(12,.75,0,0);
+        trigmecanum.mecanumDrive(0, 0, 0, false, false);
+    }
+    public void turnRight(double turnAngle, double timeoutS) {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double speed=1;
+        double scaledSpeed=speed;
+        double targetHeading = angles.firstAngle+turnAngle;
+        if(targetHeading < -180) {targetHeading += 360;}
+        if(targetHeading > 180){targetHeading -= 360;}
+        double degreesRemaining = ((int)(Math.signum(targetHeading-angles.firstAngle)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                + (int)(Math.signum(angles.firstAngle-targetHeading)+1)/2*Math.abs(angles.firstAngle-targetHeading);
+        runtime.reset();
+        while (runtime.seconds() < timeoutS && degreesRemaining>3)
+        {
+            scaledSpeed=degreesRemaining/(10+degreesRemaining)*speed;
+            if(scaledSpeed>1 || scaledSpeed<.5){scaledSpeed=.5;}//We have a minimum and maximum scaled speed
+
+            trigmecanum.mecanumDrive(0,0, -scaledSpeed, false, false);
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            degreesRemaining = ((int)(Math.signum(targetHeading-angles.firstAngle)+1)/2)*(360-Math.abs(angles.firstAngle-targetHeading))
+                    + (int)(Math.signum(angles.firstAngle-targetHeading)+1)/2*Math.abs(angles.firstAngle-targetHeading);
         }
-     */
+        trigmecanum.mecanumDrive(0, 0, 0, false, false);
+    }
+
 }

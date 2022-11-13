@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.auton.OdometryGlobalCoordinatePosition;
 import org.firstinspires.ftc.teamcode.auton.PurpleAutoDrive;
 import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
+import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
 @Autonomous(name = "LeftAuto")
@@ -22,6 +23,8 @@ public class LeftAuto extends LinearOpMode {
 
     private PurpleTagRecognition purpleTagRecognition = null;
     private PurpleAutoDrive purpleAutoDrive = null;
+    private PurpleOps purpleOps = null;
+
     private DcMotor theSlideMotor = null;
     private DigitalChannel slideSwitch = null;
     // Tag ID 1, 2, and 3 from the 36h11 family
@@ -76,20 +79,23 @@ public class LeftAuto extends LinearOpMode {
             position = RIGHT;
         }
         //TODO test code REMOVE BEFORE OFFICIAL TESTING
-        slideAction(12, -.5);
-        sleep(2000);
-        slideAction(0,.5);
+        purpleOps.clawClosed();
+        slideAction(5, -.5);
 
         goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
 
         goToPosition(36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.5,0,2*COUNTS_PER_INCH);
-        turnLeft(0,2);
-        sleep(2000);
-        //Simulate putting claw up
+        //Did 5 up earlier
+        slideAction(30, -.5);
+
         goToPosition(36*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        sleep(500);
+        purpleOps.clawOpen();
+        sleep(100);
         goToPosition(36*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
         //simulate claw down
-        sleep(2000);
+        purpleOps.clawClosed();
+        slideAction(-35,.5);
 
         if(position == LEFT){
             goToPosition(-18*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
@@ -109,6 +115,10 @@ public class LeftAuto extends LinearOpMode {
     private void initHardware() {
         purpleTagRecognition = new PurpleTagRecognition();
         purpleTagRecognition.initHardware(hardwareMap);
+
+        purpleOps = new PurpleOps();
+        purpleOps.init(hardwareMap);
+
         //TODO uncomment these once we have the limit switch
         //slideSwitch1 = hwMap.get(DigitalChannel.class, "slide_switch");
         //slideSwitch1.setMode(DigitalChannel.Mode.INPUT);
