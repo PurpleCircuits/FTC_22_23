@@ -83,7 +83,8 @@ public class RightAuto extends LinearOpMode {
         goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
         //Did 5 up earlier
         slideAction(30, -.5);
-
+//TODO needed this for other side, test this
+        turnRight(20,3);
         goToPosition(-36*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
         sleep(500);
         purpleOps.clawOpen();
