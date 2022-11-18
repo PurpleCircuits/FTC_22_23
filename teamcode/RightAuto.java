@@ -78,30 +78,27 @@ public class RightAuto extends LinearOpMode {
         purpleOps.clawClosed();
         slideAction(5, -.5);
 
-        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
 
-        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
         slideAction(30, -.5);
-//TODO needed this for other side, test this
-        turnRight(20,3);
         goToPosition(-36*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
         sleep(500);
         purpleOps.clawOpen();
         sleep(100);
-        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
-        purpleOps.clawClosed();
+        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         slideAction(-35,.5);
 
         if(position == LEFT){
-            goToPosition(24*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
-            goToPosition(24*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+            goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         } else if(position == MIDDLE){
-            goToPosition(0*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
-            goToPosition(0*COUNTS_PER_INCH,48*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+            goToPosition(2*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(2*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         } else {
-            goToPosition(-24*COUNTS_PER_INCH,24*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
-            goToPosition(-24*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,1*COUNTS_PER_INCH);
+            goToPosition(-22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(-22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         }
         //stops the mapping thread
         globalPositionUpdate.stop();
