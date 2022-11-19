@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
 import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-@Autonomous(name = "RightAuto")
+@Autonomous(name = "RightAutoMid")
 public class RightAutoMid extends LinearOpMode {
 
     private PurpleTagRecognition purpleTagRecognition = null;
@@ -178,6 +178,8 @@ public class RightAutoMid extends LinearOpMode {
         double originalDistance = distance;
         boolean willTravelMoreThanTenInches = (10*COUNTS_PER_INCH) < originalDistance;
 
+        double orientationWithMath = desiredRobotOrientation - 180;
+
         while(opModeIsActive() && distance > allowableDistanceError) {
             distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
             distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
@@ -193,8 +195,19 @@ public class RightAutoMid extends LinearOpMode {
             }
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
-            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
+            double degreeOffAngle = orientationWithMath + globalPositionUpdate.returnOrientation();
+            double turnStickPower = 0;
+            if (degreeOffAngle < 0) {
+                //Less than zero is negative number, so we must be to the right of the angle
+                turnStickPower = -0.1;
+            } else if (degreeOffAngle > 0){
+                //positive number is left of the angle.
+                turnStickPower = 0.1;
+            } else {
+                //we are at the angle
+                turnStickPower = 0;
+            }
+            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, turnStickPower, false, false);
         }
         trigmecanum.mecanumDrive(0,0,0, false, false);
         //TODO if we move this into another class, get rid of the sleep
