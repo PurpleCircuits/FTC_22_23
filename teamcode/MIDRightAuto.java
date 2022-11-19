@@ -1,18 +1,40 @@
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.auton.OdometryGlobalCoordinatePosition;
+import org.firstinspires.ftc.teamcode.auton.PurpleAutoDrive;
+import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
+import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class PurpleAutoDrive {
+@Autonomous(name = "HIGHRightAuto")
+public class MIDRightAuto extends LinearOpMode {
+
+    private PurpleTagRecognition purpleTagRecognition = null;
+    private PurpleAutoDrive purpleAutoDrive = null;
+    private PurpleOps purpleOps = null;
+
+    private DcMotor theSlideMotor = null;
+    private DigitalChannel slideSwitch = null;
+    // Tag ID 1, 2, and 3 from the 36h11 family
+    int LEFT = 1;
+    int MIDDLE = 2;
+    int RIGHT = 3;
+
+    private BNO055IMU imu = null;
+
+    //TODO copied from other area
     //Drive motors
     DcMotor right_front, right_back, left_front, left_back;
     //Odometry Wheels
@@ -20,7 +42,6 @@ public class PurpleAutoDrive {
 
     final double COUNTS_PER_INCH = 1303.83575;
 
-    private BNO055IMU imu = null;
     private Trigmecanum trigmecanum = null;
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -30,35 +51,75 @@ public class PurpleAutoDrive {
 
     OdometryGlobalCoordinatePosition globalPositionUpdate;
 
- public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError, int timeout) {
-     double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
-     double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
 
-     double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+    @Override
+    public void runOpMode() {
+        //initalize hardware
+        initHardware();
+        waitForStart();
 
-     runtime.reset();
-     while(runtime.seconds() < timeout && distance > allowableDistanceError) {
-         distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
-         distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
-         distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+        //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
+        globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
+        Thread positionThread = new Thread(globalPositionUpdate);
+        positionThread.start();
+        //TODO Check lines 71/72 of the sample program to see if these reverses are correct, may have to add these back
+        globalPositionUpdate.reverseRightEncoder();
+        globalPositionUpdate.reverseNormalEncoder();
 
-         //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
-            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
-
-            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
-            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
-            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
+        int position = RIGHT;
+        //TODO maybe put the like driving to drop cone code before this and only access this later, otherwise repetitive code
+        if(purpleTagRecognition.getDetection() == LEFT){
+            position = LEFT;
+        } else if(purpleTagRecognition.getDetection() == MIDDLE){
+            position = MIDDLE;
+        } else {
+            position = RIGHT;
         }
-     trigmecanum.mecanumDrive(0,0,0, false, false);
- }
+        purpleOps.clawClosed();
+        slideAction(5, -.5);
 
- //changed this to public from private for outside access
-    public void initDriveHardwareMap(HardwareMap hardwareMap){
+        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+
+        goToPosition(-12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        //Did 5 up earlier
+        slideAction(20, -.5);
+        goToPosition(-12*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        sleep(500);
+        purpleOps.clawOpen();
+        sleep(100);
+        goToPosition(-12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        slideAction(-25,.5);
+
+        if(position == LEFT){
+            goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+        } else if(position == MIDDLE){
+            goToPosition(2*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(2*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+        } else {
+            goToPosition(-22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(-22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+        }
+        //stops the mapping thread
+        globalPositionUpdate.stop();
+    }
+
+
+    private void initHardware() {
+        purpleTagRecognition = new PurpleTagRecognition();
+        purpleTagRecognition.initHardware(hardwareMap);
+
+        purpleOps = new PurpleOps();
+        purpleOps.init(hardwareMap);
+
         right_front = hardwareMap.dcMotor.get(rfName);
         right_back = hardwareMap.dcMotor.get(rbName);
         left_front = hardwareMap.dcMotor.get(lfName);
         left_back = hardwareMap.dcMotor.get(lbName);
+
+        theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");
+        theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
+        theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         verticalLeft = hardwareMap.dcMotor.get(verticalLeftEncoderName);
         verticalRight = hardwareMap.dcMotor.get(verticalRightEncoderName);
@@ -82,7 +143,6 @@ public class PurpleAutoDrive {
         verticalRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         horizontal.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
         right_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right_back.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -102,19 +162,38 @@ public class PurpleAutoDrive {
         trigmecanum = new Trigmecanum();
         trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
 
+        // Log that init hardware is finished
+        telemetry.log().clear();
+        telemetry.log().add("Init. hardware finished.");
+        telemetry.clear();
+        telemetry.update();
     }
 
-    public void startObservation()
-    {
-        //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
-        globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
-        Thread positionThread = new Thread(globalPositionUpdate);
-        positionThread.start();
-        //Check the next two lines if the encoders ever start acting up
-        globalPositionUpdate.reverseRightEncoder();
-        globalPositionUpdate.reverseNormalEncoder();
-    }
+    private void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError){
+        double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
+        double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
 
+        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+        double originalDistance = distance;
+
+        while(opModeIsActive() && distance > allowableDistanceError) {
+            distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
+            distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
+            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+
+            //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
+            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
+
+            //TODO if distance is less than 10% of original distance (and the original distance was greater than 10 inches(*ticks) - change power to .5 for precision
+            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
+            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
+            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
+        }
+        trigmecanum.mecanumDrive(0,0,0, false, false);
+        //TODO if we move this into another class, get rid of the sleep
+        sleep(200);
+    }
     /**
      * Calculate the power in the x direction
      * @param desiredAngle angle on the x axis
@@ -133,6 +212,19 @@ public class PurpleAutoDrive {
      */
     private double calculateY(double desiredAngle, double speed) {
         return Math.cos(Math.toRadians(desiredAngle)) * speed;
+    }
+    private void slideAction(double inchHeight, double power){
+        double speed = power;
+        theSlideMotor.setTargetPosition(0);
+        theSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        theSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //38.814 is the ticks per inch on
+        theSlideMotor.setTargetPosition((int)(inchHeight * 38.814));
+        theSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        theSlideMotor.setPower(speed);
+        while(opModeIsActive() && theSlideMotor.isBusy()){
+        }
+        theSlideMotor.setPower(0);
     }
 
     public void turnLeft(double turnAngle, double timeoutS) {
@@ -170,7 +262,7 @@ public class PurpleAutoDrive {
         runtime.reset();
         while (runtime.seconds() < timeoutS && degreesRemaining>3)
         {
-            scaledSpeed = degreesRemaining / (10 + degreesRemaining) * speed;
+            scaledSpeed=degreesRemaining/(10+degreesRemaining)*speed;
             if(scaledSpeed>1 || scaledSpeed<.5){scaledSpeed=.5;}//We have a minimum and maximum scaled speed
 
             trigmecanum.mecanumDrive(0,0, -scaledSpeed, false, false);
@@ -180,7 +272,5 @@ public class PurpleAutoDrive {
         }
         trigmecanum.mecanumDrive(0, 0, 0, false, false);
     }
-    public void cleanUp(){
-        globalPositionUpdate.stop();
-    }
+
 }

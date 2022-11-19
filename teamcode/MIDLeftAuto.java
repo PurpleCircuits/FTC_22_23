@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
 import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-@Autonomous(name = "RightAuto")
-public class RightAuto extends LinearOpMode {
+@Autonomous(name = "MIDLeftAuto")
+public class MIDLeftAuto extends LinearOpMode {
 
     private PurpleTagRecognition purpleTagRecognition = null;
     private PurpleAutoDrive purpleAutoDrive = null;
@@ -32,6 +32,9 @@ public class RightAuto extends LinearOpMode {
     int MIDDLE = 2;
     int RIGHT = 3;
 
+    //private DcMotor theSpinMotor = null;
+    //private DcMotor theClawMotor = null;
+    //private Servo theClawServo = null;
     private BNO055IMU imu = null;
 
     //TODO copied from other area
@@ -75,30 +78,34 @@ public class RightAuto extends LinearOpMode {
         } else {
             position = RIGHT;
         }
+        //TODO test code REMOVE BEFORE OFFICIAL TESTING
         purpleOps.clawClosed();
         slideAction(5, -.5);
 
         goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
 
-        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        goToPosition(12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
-        slideAction(30, -.5);
-        goToPosition(-36*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        slideAction(20, -.5);
+
+        goToPosition(12*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
         sleep(500);
         purpleOps.clawOpen();
         sleep(100);
-        goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
-        slideAction(-35,.5);
+        goToPosition(12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        //simulate claw down
+        //purpleOps.clawClosed();
+        slideAction(-25,.5);
 
         if(position == LEFT){
-            goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
-            goToPosition(22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
-        } else if(position == MIDDLE){
-            goToPosition(2*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
-            goToPosition(2*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
-        } else {
             goToPosition(-22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
             goToPosition(-22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+        } else if(position == MIDDLE){
+            goToPosition(-2*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(-2*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+        } else {
+            goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         }
         //stops the mapping thread
         globalPositionUpdate.stop();
@@ -112,14 +119,18 @@ public class RightAuto extends LinearOpMode {
         purpleOps = new PurpleOps();
         purpleOps.init(hardwareMap);
 
-        right_front = hardwareMap.dcMotor.get(rfName);
-        right_back = hardwareMap.dcMotor.get(rbName);
-        left_front = hardwareMap.dcMotor.get(lfName);
-        left_back = hardwareMap.dcMotor.get(lbName);
+        //TODO uncomment these once we have the limit switch
+        //slideSwitch1 = hwMap.get(DigitalChannel.class, "slide_switch");
+        //slideSwitch1.setMode(DigitalChannel.Mode.INPUT);
 
         theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");
         theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
         theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        right_front = hardwareMap.dcMotor.get(rfName);
+        right_back = hardwareMap.dcMotor.get(rbName);
+        left_front = hardwareMap.dcMotor.get(lfName);
+        left_back = hardwareMap.dcMotor.get(lbName);
 
         verticalLeft = hardwareMap.dcMotor.get(verticalLeftEncoderName);
         verticalRight = hardwareMap.dcMotor.get(verticalRightEncoderName);
@@ -214,6 +225,7 @@ public class RightAuto extends LinearOpMode {
     private double calculateY(double desiredAngle, double speed) {
         return Math.cos(Math.toRadians(desiredAngle)) * speed;
     }
+
     private void slideAction(double inchHeight, double power){
         double speed = power;
         theSlideMotor.setTargetPosition(0);
@@ -223,9 +235,9 @@ public class RightAuto extends LinearOpMode {
         theSlideMotor.setTargetPosition((int)(inchHeight * 38.814));
         theSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         theSlideMotor.setPower(speed);
-        while(opModeIsActive() && theSlideMotor.isBusy()){
-        }
-        theSlideMotor.setPower(0);
+            while(opModeIsActive() && theSlideMotor.isBusy()){
+            }
+            theSlideMotor.setPower(0);
     }
 
     public void turnLeft(double turnAngle, double timeoutS) {

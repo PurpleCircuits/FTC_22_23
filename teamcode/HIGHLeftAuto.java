@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
 import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-@Autonomous(name = "LeftAuto")
-public class LeftAuto extends LinearOpMode {
+@Autonomous(name = "HIGHLeftAuto")
+public class HIGHLeftAuto extends LinearOpMode {
 
     private PurpleTagRecognition purpleTagRecognition = null;
     private PurpleAutoDrive purpleAutoDrive = null;
