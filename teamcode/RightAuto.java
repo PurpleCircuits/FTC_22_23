@@ -175,6 +175,7 @@ public class RightAuto extends LinearOpMode {
         double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
 
         double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+        double originalDistance = distance;
 
         while(opModeIsActive() && distance > allowableDistanceError) {
             distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
@@ -184,6 +185,7 @@ public class RightAuto extends LinearOpMode {
             //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
             double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
 
+            //TODO if distance is less than 10% of original distance (and the original distance was greater than 10 inches(*ticks) - change power to .5 for precision
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
             //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();

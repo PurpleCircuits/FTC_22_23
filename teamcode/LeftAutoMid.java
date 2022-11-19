@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.auton.PurpleTagRecognition;
 import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-@Autonomous(name = "LeftAuto")
-public class LeftAuto extends LinearOpMode {
+@Autonomous(name = "LeftAutoMid")
+public class LeftAutoMid extends LinearOpMode {
 
     private PurpleTagRecognition purpleTagRecognition = null;
     private PurpleAutoDrive purpleAutoDrive = null;
@@ -84,18 +84,18 @@ public class LeftAuto extends LinearOpMode {
 
         goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
 
-        goToPosition(33*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        goToPosition(11*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
-        slideAction(30, -.5);
+        slideAction(20, -.5);
 
-        goToPosition(33*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        goToPosition(11*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
         sleep(500);
         purpleOps.clawOpen();
         sleep(100);
-        goToPosition(33*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        goToPosition(11*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //simulate claw down
         //purpleOps.clawClosed();
-        slideAction(-35,.5);
+        slideAction(-25,.5);
 
         if(position == LEFT){
             goToPosition(-22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
