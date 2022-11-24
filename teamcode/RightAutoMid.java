@@ -90,7 +90,7 @@ public class RightAutoMid extends LinearOpMode {
         goToPosition(-12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         slideAction(-25,.5);
 
-        if(position == LEFT){
+        if(position == RIGHT){
             goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
             goToPosition(22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         } else if(position == MIDDLE){
@@ -191,7 +191,7 @@ public class RightAutoMid extends LinearOpMode {
             //TODO if distance is less than 10% of original distance (and the original distance was greater than 10 inches(*ticks) - change power to .5 for precision
             boolean isCloseToPosition = .1 <= (distance/originalDistance);
             if (willTravelMoreThanTenInches && isCloseToPosition) {
-                robotPower = .5;
+                //robotPower = .5;
             }
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
@@ -199,15 +199,15 @@ public class RightAutoMid extends LinearOpMode {
             double turnStickPower = 0;
             if (degreeOffAngle < 0) {
                 //Less than zero is negative number, so we must be to the right of the angle
-                turnStickPower = -0.1;
+                turnStickPower = 0.1;
             } else if (degreeOffAngle > 0){
                 //positive number is left of the angle.
-                turnStickPower = 0.1;
+                turnStickPower = -0.1;
             } else {
                 //we are at the angle
                 turnStickPower = 0;
             }
-            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, turnStickPower, false, false);
+            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
         }
         trigmecanum.mecanumDrive(0,0,0, false, false);
         //TODO if we move this into another class, get rid of the sleep
