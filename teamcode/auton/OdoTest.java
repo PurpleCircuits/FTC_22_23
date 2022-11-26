@@ -42,7 +42,7 @@ public class OdoTest extends LinearOpMode {
         telemetry.update();
         waitForStart();
         purpleAutoDrive.startObservation();
-/*
+
         //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
         globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
         Thread positionThread = new Thread(globalPositionUpdate);
@@ -51,29 +51,21 @@ public class OdoTest extends LinearOpMode {
         globalPositionUpdate.reverseRightEncoder();
         globalPositionUpdate.reverseNormalEncoder();
 
- */
-
-        //SAMPLE DRIVE CODE, 24 inches forward
 
         //TODO AJN - opmodeIsActive should be an if check (line above and below) - no whiles in Autonomous
         while(opModeIsActive()){
-            //trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
-            if(gamepad1.a){
-                //goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
-                purpleAutoDrive.goToPosition(0,24,.5,0,1,5);
-            }
+            trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
 
             //Display Global (x, y, theta) coordinates
-            //telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
-            //telemetry.addData("Y Position", globalPositionUpdate.returnYCoordinate() / COUNTS_PER_INCH);
-            //telemetry.addData("Orientation (Degrees)", globalPositionUpdate.returnOrientation());
+            telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
+            telemetry.addData("Y Position", globalPositionUpdate.returnYCoordinate() / COUNTS_PER_INCH);
+            telemetry.addData("Orientation (Degrees)", globalPositionUpdate.returnOrientation());
 
-            //telemetry.addData("Vertical left encoder position", verticalLeft.getCurrentPosition());
-            //telemetry.addData("Vertical right encoder position", verticalRight.getCurrentPosition());
-            //telemetry.addData("horizontal encoder position", horizontal.getCurrentPosition());
+            telemetry.addData("Vertical left encoder position", verticalLeft.getCurrentPosition());
+            telemetry.addData("Vertical right encoder position", verticalRight.getCurrentPosition());
+            telemetry.addData("horizontal encoder position", horizontal.getCurrentPosition());
 
-            //telemetry.addData("Thread Active", positionThread.isAlive());
-            //telemetry.update();
+            telemetry.update();
         }
 
         //Stop the thread
@@ -82,29 +74,51 @@ public class OdoTest extends LinearOpMode {
 
     }
 
- private void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError){
-     double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
-     double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
+    private void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError){
+        double distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
+        double distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
 
-     double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+        double originalDistance = distance;
+        boolean willTravelMoreThanTenInches = (10*COUNTS_PER_INCH) < originalDistance;
 
-     while(opModeIsActive() && distance > allowableDistanceError) {
-         distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
-         distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
-         distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+        double orientationWithMath = desiredRobotOrientation - 180;
 
-         //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
+        while(opModeIsActive() && distance > allowableDistanceError) {
+            distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
+            distanceToYTarget = targetYPosition - globalPositionUpdate.returnYCoordinate();
+            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+
+            //TODO the x and y may need to be flip flopped, atan2 has been changed since the tutorial? UPDATE, no they have not
             double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
 
+            //TODO if distance is less than 10% of original distance (and the original distance was greater than 10 inches(*ticks) - change power to .5 for precision
+            boolean isCloseToPosition = .1 <= (distance/originalDistance);
+            if (willTravelMoreThanTenInches && isCloseToPosition) {
+                //robotPower = .5;
+            }
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+            double degreeOffAngle = orientationWithMath + globalPositionUpdate.returnOrientation();
+            double turnStickPower = 0;
+            if (degreeOffAngle < 0) {
+                //Less than zero is negative number, so we must be to the right of the angle
+                turnStickPower = 0.1;
+            } else if (degreeOffAngle > 0){
+                //positive number is left of the angle.
+                turnStickPower = -0.1;
+            } else {
+                //we are at the angle
+                turnStickPower = 0;
+            }
             trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
         }
-     trigmecanum.mecanumDrive(0,0,0, false, false);
- }
+        trigmecanum.mecanumDrive(0,0,0, false, false);
+        //TODO if we move this into another class, get rid of the sleep
+        sleep(200);
+    }
 
- //TODO
+    //TODO
  private void initHardware() {
 
      purpleAutoDrive = new PurpleAutoDrive();
