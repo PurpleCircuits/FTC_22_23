@@ -76,13 +76,14 @@ public class RightAutoMid extends LinearOpMode {
             position = RIGHT;
         }
         purpleOps.clawClosed();
-        slideAction(5, -.5);
+        sleep(250);
+        slideAction(6, -.5);
 
         goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
 
         goToPosition(-12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
-        slideAction(20, -.5);
+        slideAction(19, -.5);
         goToPosition(-12*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
         sleep(500);
         purpleOps.clawOpen();

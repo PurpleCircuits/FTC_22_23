@@ -76,6 +76,7 @@ public class HIGHRightAuto extends LinearOpMode {
             position = RIGHT;
         }
         purpleOps.clawClosed();
+        sleep(250);
         slideAction(5, -.5);
 
         goToPosition(0*COUNTS_PER_INCH,25*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);

@@ -80,6 +80,7 @@ public class HIGHLeftAuto extends LinearOpMode {
         }
         //TODO test code REMOVE BEFORE OFFICIAL TESTING
         purpleOps.clawClosed();
+        sleep(250);
         slideAction(5, -.5);
 
         goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
