@@ -47,7 +47,7 @@ public class PurpleAutoDrive {
 
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+            double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
             trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
         }
      trigmecanum.mecanumDrive(0,0,0, false, false);

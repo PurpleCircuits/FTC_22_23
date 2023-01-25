@@ -6,13 +6,28 @@ CURRENTLY We are in the feedforward tuning process changing the kV and kA, the r
 ka and mainly KV need to be edited (like 0.00012 or something, very small numbers)
 in StandardTrackingWheelLocalizer on line like 30 something check the forward offset, it needs to be off the center of rotation, i dont really know where that is so i just assumed it was in line with the center bar
 
+
+ROADRUNNER ENCODER DEFINITIONS
 right encoder = motorFrontRight
 left encoder = motorFrontLeft
 front encoder/horizontal encoder = motorBackLeft
 
+----------------------------------------------------------------------------
+
+OUR ENCODER DEFINITIONS:
+String verticalLeftEncoderName = rbName, verticalRightEncoderName = lfName, horizontalEncoderName = rfName;
+
+frontleft   = 0
+frontright  = 1
+backleft    = 2
+backright   = 3
 may need to reverse some encoders in StandardTrackingWheelLocalizer
 
 OUR FTC Dashboard (in top right dropdown press field to see the field)
 http://192.168.43.1:8080/dash
 
 Driveconstants kA kV and kStatic can be changed in the dashboard *TEMPORARILY* but permenantly in the DriveConstants class line
+**PRESS ENTER TO OFFICIALLY CHANGE IT**
+
+CHANGE the divisor on pivotCorrection to like 100 or someting, its not creating a substantial number yet, 
+MAYBE say if its over 1 set it to 1 as to not go over 

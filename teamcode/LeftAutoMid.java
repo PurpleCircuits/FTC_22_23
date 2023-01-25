@@ -81,9 +81,9 @@ public class LeftAutoMid extends LinearOpMode {
         //TODO test code REMOVE BEFORE OFFICIAL TESTING
         purpleOps.clawClosed();
         sleep(250);
-        slideAction(6, -.5);
+        //slideAction(1, -.5);
 
-        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,90,2*COUNTS_PER_INCH);
 
         goToPosition(10*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
@@ -200,8 +200,8 @@ public class LeftAutoMid extends LinearOpMode {
             //TODO if distance is less than 10% of original distance (and the original distance was greater than 10 inches(*ticks) - change power to .5 for precision
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
-            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
+            double pivotCorrection = ((double)(desiredRobotOrientation - globalPositionUpdate.returnOrientation())) / 360.0;
+            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, pivotCorrection, false, false);
         }
         trigmecanum.mecanumDrive(0,0,0, false, false);
         //TODO if we move this into another class, get rid of the sleep
@@ -227,13 +227,23 @@ public class LeftAutoMid extends LinearOpMode {
         return Math.cos(Math.toRadians(desiredAngle)) * speed;
     }
 
+    /**
+     * Puts claw (20 motor AndyMark) to specified inch height at a power
+     *
+     * @param inchHeight the height in inches that you want the slide to go TO
+     *
+     * @param power specifies the power that you want the motor to run at **NEGATIVE POWER IS UP**
+     */
     private void slideAction(double inchHeight, double power){
         double speed = power;
         theSlideMotor.setTargetPosition(0);
         theSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         theSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //38.814 is the ticks per inch on
-        theSlideMotor.setTargetPosition((int)(inchHeight * 38.814));
+        //38.814 is the ticks per inch on rev motor NOT ANDYMARK
+        //537.6 revolutions per minute for andymark 20 motor / 2 for the gear ratio == 268.8
+        //2.3622 inch diameter wheel
+        //268.8 / 2.3622pi = 36.221191011 ticks per inch
+        theSlideMotor.setTargetPosition((int)(inchHeight * 36.2211));
         theSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         theSlideMotor.setPower(speed);
             while(opModeIsActive() && theSlideMotor.isBusy()){
