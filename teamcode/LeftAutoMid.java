@@ -83,7 +83,7 @@ public class LeftAutoMid extends LinearOpMode {
         sleep(250);
         //slideAction(1, -.5);
 
-        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,90,2*COUNTS_PER_INCH);
+        goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
 
         goToPosition(10*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
@@ -200,7 +200,11 @@ public class LeftAutoMid extends LinearOpMode {
             //TODO if distance is less than 10% of original distance (and the original distance was greater than 10 inches(*ticks) - change power to .5 for precision
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            double pivotCorrection = ((double)(desiredRobotOrientation - globalPositionUpdate.returnOrientation())) / 360.0;
+            double pivotCorrection = ((double)(desiredRobotOrientation - globalPositionUpdate.returnOrientation())) / 100.0;
+            //set max speed to full at one
+            //if(Math.abs(pivotCorrection) > 1.0){
+            //    pivotCorrection /= pivotCorrection;
+            //}
             trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, pivotCorrection, false, false);
         }
         trigmecanum.mecanumDrive(0,0,0, false, false);

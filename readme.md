@@ -17,10 +17,10 @@ front encoder/horizontal encoder = motorBackLeft
 OUR ENCODER DEFINITIONS:
 String verticalLeftEncoderName = rbName, verticalRightEncoderName = lfName, horizontalEncoderName = rfName;
 
-frontleft   = 0
-frontright  = 1
+frontleft   = 0 rightencoder
+frontright  = 1 horizontal
 backleft    = 2
-backright   = 3
+backright   = 3 leftencoder
 may need to reverse some encoders in StandardTrackingWheelLocalizer
 
 OUR FTC Dashboard (in top right dropdown press field to see the field)
