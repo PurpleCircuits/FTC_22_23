@@ -64,7 +64,7 @@ public class RightAutoMid extends LinearOpMode {
         positionThread.start();
         //TODO Check lines 71/72 of the sample program to see if these reverses are correct, may have to add these back
         globalPositionUpdate.reverseRightEncoder();
-        globalPositionUpdate.reverseNormalEncoder();
+        //globalPositionUpdate.reverseNormalEncoder();
 
         int position = RIGHT;
         //TODO maybe put the like driving to drop cone code before this and only access this later, otherwise repetitive code
@@ -238,8 +238,11 @@ public class RightAutoMid extends LinearOpMode {
         theSlideMotor.setTargetPosition(0);
         theSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         theSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //38.814 is the ticks per inch on
-        theSlideMotor.setTargetPosition((int)(inchHeight * 38.814));
+        //38.814 is the ticks per inch on rev motor NOT ANDYMARK
+        //537.6 ticks rev for andymark 20 motor / 2 for the gear ratio == 268.8
+        //2.3622 inch diameter wheel
+        //268.8 / 2.3622pi = 36.221191011 ticks per inch
+        theSlideMotor.setTargetPosition((int)(inchHeight * 113.802));
         theSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         theSlideMotor.setPower(speed);
         while(opModeIsActive() && theSlideMotor.isBusy()){
