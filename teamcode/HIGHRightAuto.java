@@ -63,7 +63,7 @@ public class HIGHRightAuto extends LinearOpMode {
         Thread positionThread = new Thread(globalPositionUpdate);
         positionThread.start();
         //TODO Check lines 71/72 of the sample program to see if these reverses are correct, may have to add these back
-        globalPositionUpdate.reverseRightEncoder();
+        globalPositionUpdate.reverseLeftEncoder();
         globalPositionUpdate.reverseNormalEncoder();
 
         int position = RIGHT;
@@ -177,6 +177,9 @@ public class HIGHRightAuto extends LinearOpMode {
 
         double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
         double originalDistance = distance;
+        //boolean willTravelMoreThanTenInches = (10*COUNTS_PER_INCH) < originalDistance;
+
+        double orientationWithMath = desiredRobotOrientation - 180;
 
         while(opModeIsActive() && distance > allowableDistanceError) {
             distanceToXTarget = targetXPosition - globalPositionUpdate.returnXCoordinate();
@@ -187,10 +190,25 @@ public class HIGHRightAuto extends LinearOpMode {
             double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToXTarget, distanceToYTarget));
 
             //TODO if distance is less than 10% of original distance (and the original distance was greater than 10 inches(*ticks) - change power to .5 for precision
+            //boolean isCloseToPosition = .1 <= (distance/originalDistance);
+            //if (willTravelMoreThanTenInches && isCloseToPosition) {
+            //robotPower = .5;
+            //}
             double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
             double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            //double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
-            trigmecanum.mecanumDrive(-robot_movement_y_component, robot_movement_x_component, 0, false, false);
+            double degreeOffAngle = orientationWithMath + globalPositionUpdate.returnOrientation();
+            double turnStickPower = 0;
+            //if (degreeOffAngle < 0) {
+            //Less than zero is negative number, so we must be to the right of the angle
+            //turnStickPower = 0.1;
+            //} else if (degreeOffAngle > 0){
+            //positive number is left of the angle.
+            //turnStickPower = -0.1;
+            //} else {
+            //we are at the angle
+            //turnStickPower = 0;
+            // }
+            trigmecanum.mecanumDrive(robot_movement_y_component, -robot_movement_x_component, 0, false, false);
         }
         trigmecanum.mecanumDrive(0,0,0, false, false);
         //TODO if we move this into another class, get rid of the sleep
@@ -220,8 +238,11 @@ public class HIGHRightAuto extends LinearOpMode {
         theSlideMotor.setTargetPosition(0);
         theSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         theSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //38.814 is the ticks per inch on
-        theSlideMotor.setTargetPosition((int)(inchHeight * 38.814));
+        //38.814 is the ticks per inch on rev motor NOT ANDYMARK
+        //537.6 ticks rev for andymark 20 motor / 2 for the gear ratio == 268.8
+        //2.3622 inch diameter wheel
+        //268.8 / 2.3622pi = 36.221191011 ticks per inc (145.101) 36.2753*2 = 78.5506
+        theSlideMotor.setTargetPosition((int)(inchHeight * 75));
         theSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         theSlideMotor.setPower(speed);
         while(opModeIsActive() && theSlideMotor.isBusy()){

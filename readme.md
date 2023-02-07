@@ -31,3 +31,5 @@ Driveconstants kA kV and kStatic can be changed in the dashboard *TEMPORARILY* b
 
 CHANGE the divisor on pivotCorrection to like 100 or someting, its not creating a substantial number yet, 
 MAYBE say if its over 1 set it to 1 as to not go over 
+
+CHECK COUNTS PER INCH IN ALL OF THE AUTO CODE *IT MIGHT BE DIFFERENT WITH NEW MOTORS AND GEARING*
