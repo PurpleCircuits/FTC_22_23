@@ -22,8 +22,8 @@ public class GlobalCoordinatePositionUpdateSample extends LinearOpMode {
 
     //Hardware map names for the encoder wheels. Again, these will change for each robot and need to be updated below
     //TODO use the commented line if switching back to old system testing
-    String verticalLeftEncoderName = "motorFrontLeft", verticalRightEncoderName = "motorFrontRight", horizontalEncoderName = "motorBackLeft";
-    //String verticalLeftEncoderName = "motorBackRight", verticalRightEncoderName = "motorFrontLeft", horizontalEncoderName = "motorFrontRight";
+    //String verticalLeftEncoderName = "motorFrontLeft", verticalRightEncoderName = "motorFrontRight", horizontalEncoderName = "motorBackLeft";
+    String verticalLeftEncoderName = "motorBackRight", verticalRightEncoderName = "motorFrontLeft", horizontalEncoderName = "motorFrontRight";
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -70,7 +70,7 @@ public class GlobalCoordinatePositionUpdateSample extends LinearOpMode {
         positionThread.start();
 
         //TODO IF NEGATIVE UNCOMMENT THESE FOR THEIR RESPECTIVE ENCODERS, normalEncoder is horizontal
-        globalPositionUpdate.reverseRightEncoder();
+        globalPositionUpdate.reverseLeftEncoder();
         globalPositionUpdate.reverseNormalEncoder();
         while(opModeIsActive()){
             //Display Global (x, y, theta) coordinates

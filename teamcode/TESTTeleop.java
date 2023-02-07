@@ -19,7 +19,7 @@ public class TESTTeleop extends LinearOpMode {
         initHardware();
         waitForStart();
         while (opModeIsActive()) {
-            trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
+            trigmecanum.mecanumDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
             //slideAction();
             //clawAction();
         }
