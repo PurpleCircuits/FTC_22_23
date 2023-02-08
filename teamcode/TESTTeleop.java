@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-@TeleOp(name="TESTTeleOp", group="Linear Opmode")
+@TeleOp(name="PurpelTeleOP", group="Linear Opmode")
 public class TESTTeleop extends LinearOpMode {
     private Trigmecanum trigmecanum = null;
-    //private PurpleOps physicaloperation = null;
-    //private DcMotor theSlideMotor = null;
+    private PurpleOps physicaloperation = null;
+    private DcMotor theSlideMotor = null;
     BNO055IMU imu;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -20,8 +20,8 @@ public class TESTTeleop extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             trigmecanum.mecanumDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
-            //slideAction();
-            //clawAction();
+            slideAction();
+            clawAction();
         }
     }
     private void initHardware(){
@@ -35,15 +35,15 @@ public class TESTTeleop extends LinearOpMode {
         trigmecanum.init(hardwareMap, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD, DcMotor.Direction.FORWARD);
         //FOR MORE ON INITALIZING MOTORS GO TO TRIGMECANUM
 
-        //physicaloperation = new PurpleOps();
-        //physicaloperation.init(hardwareMap);
+        physicaloperation = new PurpleOps();
+        physicaloperation.init(hardwareMap);
 
-        //theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");
-        //theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
-        //theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        theSlideMotor = hardwareMap.get(DcMotor.class, "the_slide_motor");
+        theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
+        theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    /*
+
     public void clawAction() {
         // close the claw
         if(gamepad2.right_bumper){
@@ -60,5 +60,4 @@ public class TESTTeleop extends LinearOpMode {
         double power = -gamepad2.left_stick_y;
         theSlideMotor.setPower(power);
     }
-     */
 }
