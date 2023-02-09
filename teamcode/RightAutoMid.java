@@ -77,29 +77,34 @@ public class RightAutoMid extends LinearOpMode {
             position = RIGHT;
         }
         purpleOps.clawClosed();
-        sleep(250);
-        slideAction(6, -.5);
+        sleep(500);
+        slideAction(3, -.5);
 
+        //goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+
+        //TODO TAKE AWAY
+        goToPosition(0*COUNTS_PER_INCH,32*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        //TODO TAKE AWAY
 
         goToPosition(-12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
-        slideAction(19, -.5);
-        goToPosition(-12*COUNTS_PER_INCH,28*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        slideAction(20, -.5);
+        goToPosition(-12*COUNTS_PER_INCH,32*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
         sleep(500);
         purpleOps.clawOpen();
         sleep(100);
         goToPosition(-12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
-        slideAction(-25,.5);
+        slideAction(-19,.5);
 
         if(position == RIGHT){
-            goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
             goToPosition(22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         } else if(position == MIDDLE){
-            goToPosition(2*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(2*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
             goToPosition(2*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         } else {
-            goToPosition(-22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+            goToPosition(-22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
             goToPosition(-22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         }
         //stops the mapping thread

@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
-@Disabled
-@TeleOp(name="Old teleop", group="Linear Opmode")
+
+@TeleOp(name="PurpelTeleOP", group="Linear Opmode")
 public class PurpleTeleOp extends LinearOpMode {
     private Trigmecanum trigmecanum = null;
     private PurpleOps physicaloperation = null;
@@ -20,7 +19,7 @@ public class PurpleTeleOp extends LinearOpMode {
         initHardware();
         waitForStart();
         while (opModeIsActive()) {
-            trigmecanum.mecanumDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
+            trigmecanum.mecanumDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
             slideAction();
             clawAction();
         }
@@ -43,6 +42,8 @@ public class PurpleTeleOp extends LinearOpMode {
         theSlideMotor.setDirection(DcMotor.Direction.FORWARD);
         theSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
+
     public void clawAction() {
         // close the claw
         if(gamepad2.right_bumper){

@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PurpleOps {
-    private static final double SERVO_MIN_POS = 0.6; // Minimum rotational position
+    private static final double SERVO_MIN_POS = 0.7; // Minimum rotational position
     private static final double SERVO_MAX_POS = 1; // Maximum rotational position
     private static final double SERVO_OPEN_POS = 1; // Start at halfway position
     private DcMotor theSlideMotor = null;
