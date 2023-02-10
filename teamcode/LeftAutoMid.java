@@ -84,28 +84,29 @@ public class LeftAutoMid extends LinearOpMode {
         goToPosition(0*COUNTS_PER_INCH,32*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
 
-        goToPosition(12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
+        goToPosition(13*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
-        slideAction(20, -.5);
+        slideAction(22, -.5);
 
-        goToPosition(12*COUNTS_PER_INCH,32*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        goToPosition(13*COUNTS_PER_INCH,33*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        slideAction(-3, -.5);
         sleep(500);
         purpleOps.clawOpen();
-        sleep(100);
+        sleep(500);
         goToPosition(12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //simulate claw down
         //purpleOps.clawClosed();
         slideAction(-22,.5);
 
         if(position == LEFT){
-            goToPosition(-22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
-            goToPosition(-22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+            goToPosition(-24*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
+            goToPosition(-24*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         } else if(position == MIDDLE){
-            goToPosition(-2*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
-            goToPosition(-2*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+            goToPosition(0*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
+            goToPosition(0*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         } else {
-            goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
-            goToPosition(22*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
+            goToPosition(24*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);
+            goToPosition(24*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.75,0,3*COUNTS_PER_INCH);
         }
         //stops the mapping thread
         globalPositionUpdate.stop();

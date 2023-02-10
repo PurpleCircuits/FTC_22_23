@@ -36,3 +36,4 @@ CHECK COUNTS PER INCH IN ALL OF THE AUTO CODE *IT MIGHT BE DIFFERENT WITH NEW MO
 If we want the slide thing we should run using encoder 
 
 Lines 22-24 on teleop if something breaks
+line up STANDARD with the pictures on phone
