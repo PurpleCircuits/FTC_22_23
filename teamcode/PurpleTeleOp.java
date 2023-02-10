@@ -19,6 +19,9 @@ public class PurpleTeleOp extends LinearOpMode {
         initHardware();
         waitForStart();
         while (opModeIsActive()) {
+            //TODO take out if this doesnt work
+            theSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            theSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             trigmecanum.mecanumDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, gamepad1.left_bumper, gamepad1.right_bumper);
             slideAction();
             clawAction();
@@ -58,6 +61,12 @@ public class PurpleTeleOp extends LinearOpMode {
     }
     public void slideAction(){
         double power = -gamepad2.left_stick_y;
+        if(gamepad2.b){
+            power /= 2;
+        }
+        if(gamepad2.right_bumper && theSlideMotor.getCurrentPosition() < 50 && theSlideMotor.getCurrentPosition() > 0){
+            power = 0;
+        }
         theSlideMotor.setPower(power);
     }
 }

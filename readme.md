@@ -33,3 +33,6 @@ CHANGE the divisor on pivotCorrection to like 100 or someting, its not creating 
 MAYBE say if its over 1 set it to 1 as to not go over 
 
 CHECK COUNTS PER INCH IN ALL OF THE AUTO CODE *IT MIGHT BE DIFFERENT WITH NEW MOTORS AND GEARING*
+If we want the slide thing we should run using encoder 
+
+Lines 22-24 on teleop if something breaks

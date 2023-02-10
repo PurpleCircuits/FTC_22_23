@@ -86,13 +86,13 @@ public class HIGHRightAuto extends LinearOpMode {
         //TODO MAYBE TAKE AWAY
         goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
         //Did 5 up earlier
-        slideAction(30, -.5);
-        goToPosition(-36*COUNTS_PER_INCH,32*COUNTS_PER_INCH,.5,0,1*COUNTS_PER_INCH);
+        slideAction(33, -.5);
+        goToPosition(-36*COUNTS_PER_INCH,36*COUNTS_PER_INCH,.55,0,1*COUNTS_PER_INCH);
         sleep(500);
         purpleOps.clawOpen();
-        sleep(100);
+        sleep(250);
         goToPosition(-36*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,1*COUNTS_PER_INCH);
-        slideAction(-33,.5);
+        slideAction(-36,.5);
 
         if(position == RIGHT){
             goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);

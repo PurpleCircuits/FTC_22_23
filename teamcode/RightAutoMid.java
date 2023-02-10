@@ -95,7 +95,7 @@ public class RightAutoMid extends LinearOpMode {
         purpleOps.clawOpen();
         sleep(100);
         goToPosition(-12*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.65,0,2*COUNTS_PER_INCH);
-        slideAction(-19,.5);
+        slideAction(-22,.5);
 
         if(position == RIGHT){
             goToPosition(22*COUNTS_PER_INCH,26*COUNTS_PER_INCH,.75,0,2*COUNTS_PER_INCH);

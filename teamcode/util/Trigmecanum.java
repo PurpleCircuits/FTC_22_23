@@ -105,7 +105,7 @@ public class Trigmecanum {
             motor3Scaled = motor3Raw;
         }
         if(A) {
-            slowdown = 0.5;
+            slowdown = 0.65;
         }else if (Y) {
             slowdown = 1;
         }
