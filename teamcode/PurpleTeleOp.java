@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.util.PurpleOps;
 import org.firstinspires.ftc.teamcode.util.Trigmecanum;
 
-@TeleOp(name="PurpelTeleOP", group="Linear Opmode")
+@TeleOp(name="PurpleTeleOP", group="Linear Opmode")
 public class PurpleTeleOp extends LinearOpMode {
     private Trigmecanum trigmecanum = null;
     private PurpleOps physicaloperation = null;
